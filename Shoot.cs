@@ -65,7 +65,7 @@ public class Shoot : MonoBehaviour {
             transform.position = transform.position + positions[1];
             isLeft = false;
 
-            Debug.Log("moving shoot point");
+            //Debug.Log("moving shoot point");
         }
     }
 

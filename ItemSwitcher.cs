@@ -166,11 +166,11 @@ public class ItemSwitcher : MonoBehaviour {
 
         if(index == 1 || index == 5)
         {
-            spriteRenderer.sortingOrder = 0;
+            spriteRenderer.sortingOrder = 1;
         }
         else
         {
-            spriteRenderer.sortingOrder = 2;
+            spriteRenderer.sortingOrder = 3;
         }
 
         spriteRenderer.sprite = items[index];

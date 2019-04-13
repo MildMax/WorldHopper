@@ -12,7 +12,9 @@ public class WorldSwitcher : MonoBehaviour {
     //for Preview()
     SpriteRenderer[][] worldRenderers = { null, null, null, null };
     Color opaque = new Color(1, 1, 1, 0.5f);
-    Color solid = new Color(1, 1, 1, 1);
+    Color solid = new Color(1, 1, 1, 1); 
+
+    SpriteRenderer[][] BGRenderers = { null, null, null, null };
 
     //GameObject[] hardWorlds = { null, null, null, null };
     //GameObject[] softWorlds = { null, null, null, null };
@@ -29,6 +31,7 @@ public class WorldSwitcher : MonoBehaviour {
         RemoveBGRenderer();
         SetLevel();
         SetActiveWorld(activeWorldNum);
+        SetInitialBG();
     }
 
     //private void Update()
@@ -51,10 +54,10 @@ public class WorldSwitcher : MonoBehaviour {
             worldColliders[i] = worlds[i].GetComponentsInChildren<Collider2D>();
         }
 
-        while (worlds.Count != 4)
-        {
-            worlds.Add(null);
-        }
+        //while (worlds.Count != 4)
+        //{
+        //    worlds.Add(null);
+        //}
     }
 
     public void Switcher()
@@ -85,25 +88,9 @@ public class WorldSwitcher : MonoBehaviour {
 
     private void SetActiveWorld(int i)
     {
-        
-        StartCoroutine(SwitchWorlds(worlds[i], worlds[activeWorldNum]));
-
-        //Debug.Log(worldRenderers[activeWorldNum].Length);
-
-        for (int k = 0; k != worldRenderers[activeWorldNum].Length; ++k)
+        if (i != activeWorldNum)
         {
-            if (worldRenderers[activeWorldNum][k] != null)
-            {
-                worldRenderers[activeWorldNum][k].enabled = false;
-            }
-        }
-        for (int k = 0; k != worldRenderers[i].Length; ++k)
-        {
-            if (worldRenderers[i][k] != null)
-            {
-                worldRenderers[i][k].enabled = true;
-                worldRenderers[i][k].color = solid;
-            }
+            SwitchBG(BGRenderers[i], BGRenderers[activeWorldNum]);
         }
 
         for (int j = 0; j != worldColliders[i].Length; ++j)
@@ -118,56 +105,42 @@ public class WorldSwitcher : MonoBehaviour {
                 worldColliders[activeWorldNum][j].enabled = false;
             }
         }
-        
+
+
+        for (int k = 0; k != worldRenderers[activeWorldNum].Length; ++k)
+        {
+            if (worldRenderers[activeWorldNum][k] != null)
+            {
+                worldRenderers[activeWorldNum][k].enabled = false;
+            }
+        }
+
+        for (int k = 0; k != worldRenderers[i].Length; ++k)
+        {
+            if (worldRenderers[i][k] != null)
+            {
+                worldRenderers[i][k].enabled = true;
+                worldRenderers[i][k].color = solid;
+            }
+        } 
 
         activeWorld = worlds[i];
-        //activeWorld.SetActive(false);
-        //activeWorld.SetActive(true);
         activeWorldNum = i;
-        
     }
 
-    private IEnumerator SwitchWorlds(GameObject set, GameObject unset)
+    private void SwitchBG(SpriteRenderer[] next, SpriteRenderer[] prev)
     {
-        if (set && unset)
+        for (int i = 0; i != next.Length; ++i)
         {
-            if (set != unset)
-            {
-                SpriteRenderer[] next = set.GetComponentsInChildren<SpriteRenderer>();
-                SpriteRenderer[] prev = unset.GetComponentsInChildren<SpriteRenderer>();
-
-                for (int i = 0; i != next.Length; ++i)
-                {
-                    if (next[i].tag == "BGRenderer")
-                    {
-                        next[i].sortingOrder = -2;
-                    }
-                    else
-                    {
-                        next[i].sortingOrder = -1;
-                    }
-                }
-
-                //set.SetActive(true);
-                yield return new WaitForEndOfFrame();
-                yield return new WaitForEndOfFrame();
-                //unset.SetActive(false);
-
-                for (int i = 0; i != next.Length; ++i)
-                {
-                    if (next[i].tag == "BGRenderer")
-                    {
-                        next[i].sortingOrder = -1;
-                    }
-                    else
-                    {
-                        next[i].sortingOrder = 0;
-                    }
-                }
-            }
-            else set.SetActive(true); yield return null;
+            next[i].sortingOrder = -1;
+            next[i].enabled = true;
         }
-        else yield return null;
+
+        for (int i = 0; i != prev.Length; ++i)
+        {
+            prev[i].enabled = false;
+            prev[i].sortingOrder = -2;
+        }
     }
 
     public void Preview()
@@ -271,14 +244,34 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
         }
+    }
 
-        //for(int i = 0; i != worlds.Count; ++i)
-        //{
-        //    if (worlds[i] != null)
-        //    {
-        //        worlds[i].SetActive(false);
-        //    }
-        //}
+    private void SetInitialBG()
+    {
+        for(int i = 0; i != BGRenderers.Length; ++i)
+        {
+            if (BGRenderers[i] != null)
+            {
+                if (BGRenderers[i] == BGRenderers[activeWorldNum])
+                {
+                    for (int j = 0; j != BGRenderers[i].Length; ++j)
+                    {
+                        BGRenderers[activeWorldNum][j].sortingOrder = -1;
+                        BGRenderers[activeWorldNum][j].enabled = true;
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j != BGRenderers[i].Length; ++j)
+                    {
+                        BGRenderers[i][j].sortingOrder = -2;
+                        BGRenderers[i][j].enabled = false;
+                    }
+                }
+            }
+        }
+
+        
     }
 
     private void RemoveBGRenderer()
@@ -287,15 +280,20 @@ public class WorldSwitcher : MonoBehaviour {
         {
             if (worldRenderers[i] != null)
             {
+
+                List<SpriteRenderer> tempList = new List<SpriteRenderer>();
+
                 for (int j = 0; j != worldRenderers[i].Length; ++j)
                 {
                     if (worldRenderers[i][j].gameObject.tag == "BGRenderer")
                     {
+                        tempList.Add(worldRenderers[i][j]);
                         //Debug.Log("renderer removed: " + worldRenderers[i][j].gameObject.name);
                         worldRenderers[i][j] = null;
                     }
                 }
 
+                BGRenderers[i] = ConvertList(tempList);
                 worldRenderers[i] = ResizeArray(worldRenderers[i]);
             }
         }
@@ -312,6 +310,8 @@ public class WorldSwitcher : MonoBehaviour {
             }
         }
 
+        //Debug.Log(len);
+
         T[] newT = new T[len];
         int index = 0;
 
@@ -320,9 +320,22 @@ public class WorldSwitcher : MonoBehaviour {
             if(t[i] != null)
             {
                 newT[index] = t[i];
+                ++index;
             }
+            
         }
 
+        return newT;
+    }
+
+    private T[] ConvertList<T>(List<T> list)
+    {
+        int len = list.Count;
+        T[] newT = new T[len];
+        for(int i = 0; i != list.Count; ++i)
+        {
+            newT[i] = list[i];
+        }
         return newT;
     }
     
