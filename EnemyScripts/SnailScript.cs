@@ -7,6 +7,9 @@ public class SnailScript : EnemyBase
     [HideInInspector]
     public int walkIndex;
 
+    //[HideInInspector]
+    public int worldNum;
+
     public delegate void WalkMethod();
     WalkMethod walkMethod;
 
@@ -38,7 +41,7 @@ public class SnailScript : EnemyBase
     bool isDead = false;
     bool deathRoutine = false;
 
-    string layer;
+    public string layer;
 
     private void Awake()
     {
@@ -52,13 +55,14 @@ public class SnailScript : EnemyBase
 
     private void FixedUpdate()
     {
-        SwitchLayerString();
+        
         CheckDistance();
     }
 
     // Update is called once per frame
     void Update()
     {
+        SwitchLayerString();
         CheckHealth();
         FlipSprites();
         SetWalkMethod();
@@ -202,11 +206,11 @@ public class SnailScript : EnemyBase
     {
         if(coll.enabled == false)
         {
-            layer = "GroundInactive";
+            layer = "GroundInactive" + (worldNum + 1);
         }
         else if(coll.enabled == true)
         {
-            layer = "Ground";
+            layer = "Ground" + (worldNum + 1);
         }
     }
 

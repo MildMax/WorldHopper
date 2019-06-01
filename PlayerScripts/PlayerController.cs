@@ -148,6 +148,8 @@ public class PlayerController : MonoBehaviour {
 
     InputManager IM;
 
+    WorldSwitcher worldSwitcher;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -158,6 +160,7 @@ public class PlayerController : MonoBehaviour {
         previousDirection = transform.position.x;
         direction = awakeDirection;
         IM = GetComponent<InputManager>();
+        worldSwitcher = GetComponentInChildren<WorldSwitcher>();
 
         offset = transform.position.x - previousDirection;
     }
@@ -279,7 +282,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (groundedFrames >= 1)
         {
-            ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground"));
+            ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
             //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
 

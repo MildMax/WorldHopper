@@ -32,7 +32,10 @@ public class SlimeScript : EnemyBase
 
     bool isGrounded = false;
 
-    string layer;
+    public string layer;
+
+    [HideInInspector]
+    public int worldNum;
 
     private void Awake()
     {
@@ -179,11 +182,11 @@ public class SlimeScript : EnemyBase
     {
         if (coll.enabled == false)
         {
-            layer = "GroundInactive";
+            layer = "GroundInactive" + (worldNum + 1);
         }
         else if (coll.enabled == true)
         {
-            layer = "Ground";
+            layer = "Ground" + (worldNum + 1);
         }
     }
 
