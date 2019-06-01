@@ -11,13 +11,13 @@ public class PlayerLightScript : MonoBehaviour {
     public Light torchLight;
 
     [HideInInspector]
-    public ItemSwitcher itemSwitcher;
+    public ItemSwitcherAlt itemSwitcherAlt;
 
     private void Awake()
     {
         worldLight = GameObject.FindGameObjectWithTag("WorldLight");
         torchLight = GetComponentInChildren<Light>();
-        itemSwitcher = GetComponentInChildren<ItemSwitcher>();
+        itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
     }
 
     //private void Update()

@@ -8,8 +8,14 @@ public class PlayerAnimationScript : MonoBehaviour {
     PlayerController playerController;
     Animator animator;
     SpriteRenderer spriteRenderer;
+    InputManager IM;
 
     public AnimationClip walk;
+
+    //set in enemy collision script
+    //used in PlayerController script
+    [HideInInspector]
+    public bool hurt = false;
 
     private float direction;
 
@@ -19,6 +25,7 @@ public class PlayerAnimationScript : MonoBehaviour {
         animator = GetComponent<Animator>();
         playerController = GetComponent<PlayerController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        IM = GetComponent<InputManager>();
     }
 
     //private void Update()
@@ -47,8 +54,12 @@ public class PlayerAnimationScript : MonoBehaviour {
     public void CheckAnimationState()
     {
         //hurt
+        if(hurt == true)
+        {
+            SetHurt();
+        }
         //dash
-        if(playerController.noDashJump == true)
+        else if(playerController.noDashJump == true)
         {
             SetDash();
         }
@@ -58,7 +69,7 @@ public class PlayerAnimationScript : MonoBehaviour {
             SetJump();
         }
         //walk
-        else if(Mathf.Abs(Input.GetAxis("Horizontal")) > 0)
+        else if(Mathf.Abs(Input.GetAxis(IM.horizontal)) > 0)
         {
             SetWalk();
         }
@@ -114,11 +125,26 @@ public class PlayerAnimationScript : MonoBehaviour {
         }
     }
 
+    private void SetHurt()
+    {
+        animator.SetBool("IsDashing", false);
+        animator.SetBool("IsJumping", false);
+        animator.SetBool("IsHurt", true);
+        animator.SetBool("IsWalking", false);
+        //StartCoroutine(HurtWait());
+    }
+
+    //private IEnumerator HurtWait()
+    //{
+    //    yield return new WaitForSeconds(0.5f);
+    //    hurt = false;
+    //}
+
     //increases the framerate of the animation while the player is running
     //called in Update() method
     public void CheckRun()
     {
-        if(animator.GetBool("IsWalking") == true && Input.GetAxisRaw("Run") > 0)
+        if(animator.GetBool("IsWalking") == true && Input.GetAxisRaw(IM.run) > 0)
         {
             animator.speed = 1.5f;
         }

@@ -85,6 +85,8 @@ public class ItemSwitcher : MonoBehaviour {
         new Vector3(0, 0.575f, 0)
     };
 
+    InputManager IM;
+
     //initializes necessary objects on load
     private void Awake()
     {
@@ -92,6 +94,7 @@ public class ItemSwitcher : MonoBehaviour {
         playerController = player.GetComponent<PlayerController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = items[itemIndex];
+        IM = GetComponentInParent<InputManager>();
     }
 
     //private void Update()
@@ -137,7 +140,7 @@ public class ItemSwitcher : MonoBehaviour {
     //determines wheter or not Swap button has been pressed
     public void Switcher()
     {
-        if(Input.GetButtonDown("Swap"))
+        if(Input.GetButtonDown(IM.swap))
         {
             startSwitcher = true;
         }
@@ -233,7 +236,7 @@ public class ItemSwitcher : MonoBehaviour {
     public void UseItem()
     {
         //button pushed
-        if(Input.GetButtonDown("UseItem"))
+        if(Input.GetButtonDown(IM.useItem))
         {
             switch(itemIndex)
             {
@@ -246,7 +249,7 @@ public class ItemSwitcher : MonoBehaviour {
         }
 
         //button released
-        if(Input.GetButtonUp("UseItem") || Input.GetButtonDown("Swap"))
+        if(Input.GetButtonUp(IM.useItem) || Input.GetButtonDown(IM.swap))
         {
             switch(itemIndex)
             {

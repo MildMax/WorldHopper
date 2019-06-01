@@ -11,7 +11,6 @@ public class BombScript : MonoBehaviour {
     Rigidbody2D playerBody;
     SpriteRenderer spriteRenderer;
     BoxCollider2D boxCollider;
-    CircleCollider2D circleCollider;
     PlayerController playerController;
 
     int hitTimer = 0;
@@ -23,11 +22,10 @@ public class BombScript : MonoBehaviour {
         body = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         boxCollider = GetComponent<BoxCollider2D>();
-        //circleCollider = GetComponent<CircleCollider2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         playerBody = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-
-        Debug.Log(playerBody.velocity.x + " " + playerBody.velocity.y);
+        IgnoreLayerCollisions();
+        //Debug.Log(playerBody.velocity.x + " " + playerBody.velocity.y);
 
         if (playerController.direction > 0)
         {
@@ -46,22 +44,10 @@ public class BombScript : MonoBehaviour {
 
     private void Update()
     {
-        //if(bodyFrozen)
-        //{
-        //    body.constraints = RigidbodyConstraints2D.None;
-        //}
 
         RaycastHit2D hit = Physics2D.Raycast(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - Mathf.Abs(boxCollider.size.y / 2 + 0.051f), boxCollider.transform.position.z),
             Vector2.down, 0.075f, LayerMask.GetMask("Ground"));
 
-        //RaycastHit2D hit = Physics2D.Raycast(new Vector3(circleCollider.transform.position.x, circleCollider.transform.position.y - Mathf.Abs(circleCollider.radius + 0.1f), 
-        //    circleCollider.transform.position.z), Vector2.down, 0.05f);
-
-        //Debug.DrawLine(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - Mathf.Abs(boxCollider.size.y / 2 + 0.051f), boxCollider.transform.position.z),
-        //    new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - Mathf.Abs(boxCollider.size.y / 2 + 0.126f), boxCollider.transform.position.z),
-        //     Color.red);
-
-        //Debug.Log(hit.collider.name);
 
         if (!hit)
         {
@@ -81,6 +67,7 @@ public class BombScript : MonoBehaviour {
 
         if(durationTimer >= 3)
         {
+            ExplosionDamage();
             Destroy(gameObject);
         }
     }
@@ -105,5 +92,35 @@ public class BombScript : MonoBehaviour {
             duration /= 1.35f;
             yield return new WaitForSeconds(duration);
         }
+    }
+
+    private void ExplosionDamage()
+    {
+        Collider2D[] results = new Collider2D[10];
+        ContactFilter2D cf = new ContactFilter2D();
+        cf.SetLayerMask(LayerMask.GetMask("Enemy"));
+        Physics2D.OverlapCircle(transform.position, 1f, cf, results);
+
+        for(int i = 0; i != results.Length; ++i)
+        {
+            if(results[i] == null)
+            {
+                break;
+            }
+            float offset = Vector2.SqrMagnitude(transform.position - results[i].transform.position);
+            float damage = 100 / (offset * 3f);
+
+            //Debug.Log(offset);
+            //Debug.Log(damage);
+
+            EnemyBase e = results[i].GetComponent<EnemyBase>();
+            e.health -= (int)damage;
+        }
+    }
+
+    private void IgnoreLayerCollisions()
+    {
+        Physics2D.IgnoreLayerCollision(gameObject.layer, 11);
+
     }
 }

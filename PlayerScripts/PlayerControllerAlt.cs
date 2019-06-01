@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerControllerAlt : MonoBehaviour
+{
 
     //used for debugging purposes
     //set in Update() method
     //public Vector2 bodyVelocity;
+    public Vector2 vel;
 
     //speed of the player's horizontal movement
     //used in Move() function
@@ -32,6 +34,9 @@ public class PlayerController : MonoBehaviour {
     //used and set in CheckIfGrounded() method
     //properties used in KeepGrounded() method
     RaycastHit2D ground;
+
+    RaycastHit2D groundLeft;
+    RaycastHit2D groundRight;
 
     //lets player jump despite KeepGrounded() method
     //set and reset in HasJumped() method
@@ -125,11 +130,29 @@ public class PlayerController : MonoBehaviour {
     //used as conditional in CheckFreeFall()
     ItemSwitcher itemSwitcher;
 
+    PlayerAnimationScript playerAnimScript;
+
+    [HideInInspector]
+    public bool isHurt = false;
+
+    public float hurtForce;
+    public float yHurtForce;
+
+    public bool onSlope = false;
+    private float zRot = 0f;
+    private Vector3 rotationVector;
+
+    bool onSlopeL = false;
+    bool onSlopeR = false;
+    Vector3 groundLeftPos;
+    Vector3 groundRightPos;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         itemSwitcher = GetComponentInChildren<ItemSwitcher>();
+        playerAnimScript = GetComponent<PlayerAnimationScript>();
         previousDirection = transform.position.x;
         direction = awakeDirection;
 
@@ -165,6 +188,40 @@ public class PlayerController : MonoBehaviour {
 
     //}
 
+    public void DoPhysics()
+    {
+        if (playerAnimScript.hurt == false)
+        {
+            //PerformKeyPresses();
+            UmbrellaDeployed();
+        }
+        else if (isHurt == true)
+        {
+            Debug.Log("get hurt");
+            body.velocity = Vector2.zero;
+            body.AddForce(new Vector2(-direction * hurtForce, yHurtForce));
+            StartCoroutine(CheckHurtHeight(body.position.x, body.position.y));
+            isHurt = false;
+        }
+
+        CheckIfGrounded();
+        KeepGroundedFU();
+        CheckDistanceToGround();
+        CheckFreeFall();
+
+    }
+
+    private IEnumerator CheckHurtHeight(float x, float y)
+    {
+        yield return new WaitForSeconds(0.1f);
+        while (grounded == false && body.position.y > y)
+        {
+            Debug.Log(grounded);
+            yield return null;
+        }
+        playerAnimScript.hurt = false;
+    }
+
     //pretty straight forward
     //called in Update() method
     public void PerformKeyPresses()
@@ -188,7 +245,82 @@ public class PlayerController : MonoBehaviour {
     {
         if (groundedFrames >= 1)
         {
-            ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, capsuleCollider.size.y / 2 + 0.05f, LayerMask.GetMask("Ground"));
+            groundLeftPos = new Vector3(capsuleCollider.transform.position.x - (capsuleCollider.size.x / 2), capsuleCollider.transform.position.y, capsuleCollider.transform.position.z);
+            groundRightPos = new Vector3(capsuleCollider.transform.position.x + (capsuleCollider.size.x / 2), capsuleCollider.transform.position.y, capsuleCollider.transform.position.z);
+
+            groundLeft = Physics2D.Raycast(groundLeftPos, -Vector3.up, capsuleCollider.size.y, LayerMask.GetMask("Ground"));
+            groundRight = Physics2D.Raycast(groundRightPos, -Vector3.up, capsuleCollider.size.y, LayerMask.GetMask("Ground"));
+
+            if (groundLeft)
+            {
+                if (groundLeft.transform.gameObject.tag == "Slope" && direction < 0)
+                {
+                    onSlopeL = true;
+                }
+                else
+                {
+                    onSlopeL = false;
+                }
+            }
+
+            if (groundRight)
+            {
+                if (groundRight.transform.gameObject.tag == "Slope" && direction > 0)
+                {
+                    onSlopeR = true;
+                }
+                else
+                {
+                    onSlopeR = false;
+                }
+            }
+
+            if (onSlopeR == true || onSlopeL == true)
+            {
+                onSlope = true;
+            }
+            else
+            {
+                onSlope = false;
+            }
+
+            if (onSlope == true)
+            {
+                Quaternion q = Quaternion.AngleAxis(zRot, Vector3.forward);
+                Vector3 newDir = new Vector3(0f, -Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f);
+                newDir = q * newDir;
+
+                ground = Physics2D.Raycast(capsuleCollider.transform.position, newDir, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, LayerMask.GetMask("Ground"));
+                //Debug.Log(ground.point.x + " " + ground.point.y);
+            }
+            else
+            {
+                ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground"));
+            }
+
+            Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
+
+            if (ground)
+            {
+                if (ground.transform.gameObject.tag == "Slope" && onSlope == true)
+                {
+                    //onSlope = true;
+                    zRot = ground.transform.eulerAngles.z;
+                    transform.position = new Vector2(transform.position.x, ground.point.y + Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2));
+                    Debug.Log(transform.position.x + " " + transform.position.y + " -- yerruh");
+                    //body.velocity = Vector2.zero;
+                }
+                else
+                {
+                    //onSlope = false;
+                    zRot = 0f;
+                }
+            }
+            else
+            {
+                //onSlope = false;
+                zRot = 0f;
+            }
 
             if (ground)
             {
@@ -204,6 +336,7 @@ public class PlayerController : MonoBehaviour {
 
             groundedFrames = 0;
         }
+
     }
 
     //Checks what keys are being pressed
@@ -222,7 +355,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         //dash key
-        if(Input.GetAxisRaw("Dash") > 0)
+        if (Input.GetAxisRaw("Dash") > 0)
         {
             //Debug.Log("Right trigger pressed");
             dash = true;
@@ -232,7 +365,7 @@ public class PlayerController : MonoBehaviour {
             dash = false;
         }
 
-        if(Input.GetAxisRaw("Run") > 0)
+        if (Input.GetAxisRaw("Run") > 0)
         {
             //Debug.Log("Left Trigger Pressed");
             run = true;
@@ -274,33 +407,43 @@ public class PlayerController : MonoBehaviour {
 
     private IEnumerator KillRunAtTimeOfJump()
     {
-        while(body.velocity.y >= 0 || grounded == false)
+        while (body.velocity.y >= 0 || grounded == false)
         {
             yield return null;
         }
         runAtTimeOfJump = false;
     }
 
-    //NOTE::: rendered obsolete by negating y velocity of rigidbody in Jump()
-    //prevent the double jump from getting totally fucking insane (up to 7.5 units w/o check)
-    //private void CheckYVelocity()
-    //{
-    //    if (body.velocity.y > 5)
-    //    {
-    //        body.velocity = new Vector2(body.velocity.x, 5);
-    //    }
-    //}
-
     //preeeeetttyyyy straight forward -- if player isn't dashing, move player
     private void Move()
     {
         if (isDashing == false)
         {
-            if(run == true && grounded == true)
-            {
-                body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * (speed * 1.5f), body.velocity.y);
+            if (run == true && grounded == true)
+            { 
+                if (onSlope == true && grounded == true)
+                {
+                    float x = Mathf.Cos(Mathf.Deg2Rad * zRot) * speed * 1.5f * Input.GetAxisRaw("Horizontal");
+                    float y = Mathf.Sin(Mathf.Deg2Rad * zRot) * speed * 1.5f * Input.GetAxisRaw("Horizontal");
+
+                    if ((direction > 0 && zRot > 90) || (direction < 0 && zRot > 0 && zRot < 90))
+                    {
+                        //slope down
+                        body.velocity = new Vector2(x, -y);
+                    }
+                    else
+                    {
+                        //Debug.Log("Doing slope movement: " + zRot);
+                        //Slope up in either direciton, doesnt matter which
+                        body.velocity = new Vector2(x, y);
+                    }
+                }
+                else
+                {
+                    body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed * 1.5f, body.velocity.y);
+                }
             }
-            else if(grounded == false && runAtTimeOfJump == true)
+            else if (grounded == false && runAtTimeOfJump == true)
             {
                 if (directionAtTimeOfJump > 0)
                 {
@@ -308,12 +451,12 @@ public class PlayerController : MonoBehaviour {
                     {
                         body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * (speed * 1.5f), body.velocity.y);
                     }
-                    else if(Input.GetAxisRaw("Horizontal") < 0)
+                    else if (Input.GetAxisRaw("Horizontal") < 0)
                     {
                         body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * (speed * 0.75f), body.velocity.y);
                     }
                 }
-                else if(directionAtTimeOfJump < 0)
+                else if (directionAtTimeOfJump < 0)
                 {
                     if (Input.GetAxisRaw("Horizontal") < 0)
                     {
@@ -327,9 +470,30 @@ public class PlayerController : MonoBehaviour {
             }
             else
             {
-                body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, body.velocity.y);
+                if (onSlope == true && grounded == true)
+                {
+                    float x = Mathf.Cos(Mathf.Deg2Rad * zRot) * speed * Input.GetAxisRaw("Horizontal");
+                    float y = Mathf.Sin(Mathf.Deg2Rad * zRot) * speed * Input.GetAxisRaw("Horizontal");
+
+                    if ((direction > 0 && zRot > 90) || (direction < 0 && zRot > 0 && zRot < 90))
+                    {
+                        //slope down
+                        body.velocity = new Vector2(x, -y);
+                    }
+                    else
+                    {
+                        //Debug.Log("Doing slope movement: " + zRot);
+                        //Slope up in either direciton, doesnt matter which
+                        body.velocity = new Vector2(x, y);
+                    }
+                }
+                else
+                {
+                    body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, body.velocity.y);
+                }
+                //body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, body.velocity.y);
             }
-        }       
+        }
     }
 
     //If player is in the air, checks the distance from the character to the ground, and starts Coroutine when it is close to the ground
@@ -367,7 +531,7 @@ public class PlayerController : MonoBehaviour {
         if (dash == true && isDashing == false && airDash == false)
         {
             StartCoroutine(EnactDash());
-            if(grounded == false)
+            if (grounded == false)
             {
                 airDash = true;
             }
@@ -416,14 +580,48 @@ public class PlayerController : MonoBehaviour {
 
     //prevents player bouncing on ground surfaces
     //used in LateUpdate() method
-    public void KeepGrounded()
+    public void KeepGroundedFU()
     {
-        if(grounded && hasJumped == false)
+        if (grounded && hasJumped == false && playerAnimScript.hurt == false)
         {
-            transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (capsuleCollider.size.y / 2));
+            if (onSlope == false)
+            {
+                transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (capsuleCollider.size.y / 2));
+            }
+            else
+            {
+                //float x = 
+                //transform.position = new Vector2(transform.position.x, ground.point.y + Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2));
+
+                //if ((direction > 0 && zRot > 90) || (direction < 0 && zRot > 0 && zRot < 90))
+                //{
+
+                //}
+                //else
+                //{
+                //    Vector3 newPos = new Vector3(0f, capsuleCollider.size.y / 2, 0f);
+                //    Quaternion q = Quaternion.AngleAxis(zRot, Vector3.forward);
+                //    Vector2 offset = (Vector2)transform.position - ground.point;
+                //    Vector2 adjust = q * newPos;
+                //    transform.position = new Vector2(transform.position.x, transform.position.y - offset.y + adjust.y);
+                //}
+            }
+
         }
     }
-    
+
+    public void KeepGroundedLU()
+    {
+        if (grounded == true)
+        {
+            transform.rotation = Quaternion.Euler(0f, 0f, zRot);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(Vector3.zero);
+        }
+    }
+
     //lets player jump from ground surfaces
     //juxtaposes KeepGrounded() method
     //used in CheckKeyInput() method
@@ -440,54 +638,12 @@ public class PlayerController : MonoBehaviour {
     //used in the Update() method
     public void CheckDirection()
     {
-        //////////////////
-        ////NOTE: this portion of code is obsolete because I'm a moron. I'm keeping it so all future me's can
-        ////see it and think, wow, maybe just take a step back and consider simpler alternate solutions
-        //////////////////
-        //this exists because the player turns around on collision with other objects because the offset
-        //becomes positive/negative when the player rebounds and thusly flips the player around
-        //affecting the dash direction, jump forces, and bomb throws, AND YES ITS CHEAP AND PROBABLY NOT THE BEST SOLUTION
-        //BUT IT WORKS SO JUST MOVE ON, ALL RIGHT, JUST MOVE THE FUCK ON, DUDE
-        //if (noDashJump == false)
-        //{
-        //    if (direction == 1)
-        //    {
-        //        offset = (transform.position.x - previousDirection) + 0.06f;
-        //    }
-        //    else if (direction == -1)
-        //    {
-        //        offset = (transform.position.x - previousDirection) - 0.06f;
-        //    }
-        //}
-        //else
-        //{
-        //    if (direction == 1)
-        //    {
-        //        offset = (transform.position.x - previousDirection) + 0.1f;
-        //    }
-        //    else if (direction == -1)
-        //    {
-        //        offset = (transform.position.x - previousDirection) - 0.1f;
-        //    }
-        //}
 
-        //if (offset != 0)
-        //{
-        //    if (Input.GetAxisRaw("Horizontal") > 0 || offset > 0)
-        //    {
-        //        direction = 1;
-        //    }
-        //    else if (Input.GetAxisRaw("Horizontal") < 0 || offset < 0)
-        //    {
-        //        direction = -1;
-        //    }
-        //}
-
-        if (Input.GetAxis("Horizontal") > 0)// || offset > 0)
+        if (Input.GetAxis("Horizontal") > 0)
         {
             direction = 1;
         }
-        else if (Input.GetAxis("Horizontal") < 0)// || offset < 0)
+        else if (Input.GetAxis("Horizontal") < 0)
         {
             direction = -1;
         }
@@ -500,13 +656,13 @@ public class PlayerController : MonoBehaviour {
     //used in LateUpdate() method
     public void NoXMovement()
     {
-        if(Input.GetAxisRaw("Horizontal") == 0 && noDashJump == false)
+        if (Input.GetAxisRaw("Horizontal") == 0 && noDashJump == false && playerAnimScript.hurt == false)
         {
             body.constraints = RigidbodyConstraints2D.FreezePositionX;
         }
         else
         {
-            body.constraints = RigidbodyConstraints2D.None;
+            body.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
         }
     }
 
@@ -526,7 +682,7 @@ public class PlayerController : MonoBehaviour {
     //called in FixedUpdate() method
     public void UmbrellaDeployed()
     {
-        if(itemSwitcher.deployUmbrella == true && body.velocity.y <= -2)
+        if (itemSwitcher.deployUmbrella == true && body.velocity.y <= -2)
         {
             body.velocity = new Vector2(body.velocity.x, -2);
         }

@@ -22,6 +22,8 @@ public class WorldSwitcher : MonoBehaviour {
     GameObject activeWorld;
     public int activeWorldNum;
 
+    InputManager IM;
+
     //public float x;
     //public float y;
 
@@ -32,6 +34,7 @@ public class WorldSwitcher : MonoBehaviour {
         SetLevel();
         SetActiveWorld(activeWorldNum);
         SetInitialBG();
+        IM = GetComponentInParent<InputManager>();
     }
 
     //private void Update()
@@ -52,7 +55,11 @@ public class WorldSwitcher : MonoBehaviour {
         {
             worldRenderers[i] = worlds[i].GetComponentsInChildren<SpriteRenderer>();
             worldColliders[i] = worlds[i].GetComponentsInChildren<Collider2D>();
+
+            //Debug.Log(worlds[i].name);
         }
+
+        
 
         //while (worlds.Count != 4)
         //{
@@ -62,24 +69,24 @@ public class WorldSwitcher : MonoBehaviour {
 
     public void Switcher()
     {
-        if (Mathf.Abs(Input.GetAxis("RJX")) > Mathf.Abs(Input.GetAxis("RJY")))
+        if (Mathf.Abs(Input.GetAxis(IM.changeX)) > Mathf.Abs(Input.GetAxis(IM.changeY)))
         {
-            if (Input.GetAxisRaw("RJX") < 0 && activeWorld != worlds[0] && worlds[0] != null)
+            if (Input.GetAxisRaw(IM.changeX) < 0 && activeWorld != worlds[0] && worlds[0] != null)
             {
                 SetActiveWorld(0);
             }
-            else if (Input.GetAxisRaw("RJX") > 0 && activeWorld != worlds[2] && worlds[2] != null)
+            else if (Input.GetAxisRaw(IM.changeX) > 0 && activeWorld != worlds[2] && worlds[2] != null)
             {
                 SetActiveWorld(2);
             }
         }
         else
         {
-            if (Input.GetAxisRaw("RJY") < 0 && activeWorld != worlds[1] && worlds[1] != null)
+            if (Input.GetAxisRaw(IM.changeY) < 0 && activeWorld != worlds[1] && worlds[1] != null)
             {
                 SetActiveWorld(1);
             }
-            else if (Input.GetAxisRaw("RJY") > 0 && activeWorld != worlds[3] && worlds[3] != null)
+            else if (Input.GetAxisRaw(IM.changeY) > 0 && activeWorld != worlds[3] && worlds[3] != null)
             {
                 SetActiveWorld(3);
             }
@@ -147,7 +154,7 @@ public class WorldSwitcher : MonoBehaviour {
     {
         bool[] buttonsPressed = { false, false, false, false };
 
-        if (Input.GetAxisRaw("DPadX") < 0 && worldRenderers[0] != null && activeWorld != worlds[0])
+        if (Input.GetAxisRaw(IM.previewX) < 0 && worldRenderers[0] != null && activeWorld != worlds[0])
         {
             for (int i = 0; i != worldRenderers[0].Length; ++i)
             {
@@ -160,7 +167,7 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
         }
-        if (Input.GetAxisRaw("DPadX") > 0 && worldRenderers[2] != null && activeWorld != worlds[2])
+        else if (Input.GetAxisRaw(IM.previewX) > 0 && worldRenderers[2] != null && activeWorld != worlds[2])
         {
             for (int i = 0; i != worldRenderers[2].Length; ++i)
             {
@@ -173,7 +180,7 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
         }
-        if (Input.GetAxisRaw("DPadY") > 0 && worldRenderers[1] != null && activeWorld != worlds[1])
+        else if (Input.GetAxisRaw(IM.previewY) > 0 && worldRenderers[1] != null && activeWorld != worlds[1])
         {
             for (int i = 0; i != worldRenderers[1].Length; ++i)
             {
@@ -186,7 +193,7 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
         }
-        if (Input.GetAxisRaw("DPadY") < 0 && worldRenderers[3] != null && activeWorld != worlds[3])
+        else if (Input.GetAxisRaw(IM.previewY) < 0 && worldRenderers[3] != null && activeWorld != worlds[3])
         {
             for (int i = 0; i != worldRenderers[3].Length; ++i)
             {
