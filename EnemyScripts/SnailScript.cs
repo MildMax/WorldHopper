@@ -234,7 +234,10 @@ public class SnailScript : EnemyBase
 
     private void MoveSnailT()
     {
-        transform.position = Vector2.MoveTowards(transform.position, destination.point, speed * Time.deltaTime);
+        if (destination != null)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, destination.point, speed * Time.deltaTime);
+        }
     }
 
     private void AdjustForCorner()
@@ -323,28 +326,31 @@ public class SnailScript : EnemyBase
 
         RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask("Ground"));
         //on top of the ground
-        if (zRot == 0)
+        if (hit)
         {
-            Debug.Log("Calling above ground height set");
-            transform.position = new Vector2(transform.position.x, hit.collider.transform.position.y + (hit.collider.bounds.size.y / 2) + (coll.size.y / 2));
-        }
-        //left of the ground
-        else if(zRot == 90 || zRot == -270)
-        {
-            Debug.Log("Calling left of ground height set");
-            transform.position = new Vector2(hit.collider.transform.position.x - (hit.collider.bounds.size.x / 2) - (coll.size.y / 2), transform.position.y);
-        }
-        //under the ground
-        else if (zRot == 180 || zRot == -180)
-        {
-            Debug.Log("Calling under the ground height set");
-            transform.position = new Vector2(transform.position.x, hit.collider.transform.position.y - (hit.collider.bounds.size.y / 2) - (coll.size.y / 2));
-        }
-        //right of the ground
-        else if(zRot == 270 || zRot == -90)
-        {
-            Debug.Log("Calling right of the ground height set");
-            transform.position = new Vector2(hit.collider.transform.position.x + (hit.collider.bounds.size.x / 2) + (coll.size.y / 2), transform.position.y);
+            if (zRot == 0)
+            {
+                //Debug.Log("Calling above ground height set");
+                transform.position = new Vector2(transform.position.x, hit.collider.transform.position.y + (hit.collider.bounds.size.y / 2) + (coll.size.y / 2));
+            }
+            //left of the ground
+            else if (zRot == 90 || zRot == -270)
+            {
+                //Debug.Log("Calling left of ground height set");
+                transform.position = new Vector2(hit.collider.transform.position.x - (hit.collider.bounds.size.x / 2) - (coll.size.y / 2), transform.position.y);
+            }
+            //under the ground
+            else if (zRot == 180 || zRot == -180)
+            {
+                //Debug.Log("Calling under the ground height set");
+                transform.position = new Vector2(transform.position.x, hit.collider.transform.position.y - (hit.collider.bounds.size.y / 2) - (coll.size.y / 2));
+            }
+            //right of the ground
+            else if (zRot == 270 || zRot == -90)
+            {
+                //Debug.Log("Calling right of the ground height set");
+                transform.position = new Vector2(hit.collider.transform.position.x + (hit.collider.bounds.size.x / 2) + (coll.size.y / 2), transform.position.y);
+            }
         }
         
     }
@@ -442,7 +448,7 @@ public class SnailScript : EnemyBase
         if (hit)
         {
             destination = new Point(hit.point, true);
-            Debug.Log("wall set");
+            //Debug.Log("wall set");
         }
         else
         {
@@ -454,22 +460,22 @@ public class SnailScript : EnemyBase
                 {
                     if(zRot == 0)
                     {
-                        Debug.Log("setting above ground pos");
+                        //Debug.Log("setting above ground pos");
                         pos = new Vector2(ground.collider.transform.position.x + (ground.collider.bounds.size.x / 2), transform.position.y);
                     }
                     else if (zRot == 90 || zRot == -270)
                     {
-                        Debug.Log("Setting left of ground pos");
+                        //Debug.Log("Setting left of ground pos");
                         pos = new Vector2(transform.position.x, ground.collider.transform.position.y + (ground.collider.bounds.size.y / 2));
                     }
                     else if (zRot == 180 || zRot == -180)
                     {
-                        Debug.Log("Setting under ground pos");
+                        //Debug.Log("Setting under ground pos");
                         pos = new Vector2(ground.collider.transform.position.x - (ground.collider.bounds.size.x / 2), transform.position.y);
                     }
                     else if (zRot == 270 || zRot == -90)
                     {
-                        Debug.Log("Setting right of ground pos");
+                        //Debug.Log("Setting right of ground pos");
                         pos = new Vector2(transform.position.x, ground.collider.transform.position.y - (ground.collider.bounds.size.y / 2));
                     }
                 }
@@ -492,7 +498,7 @@ public class SnailScript : EnemyBase
                         pos = new Vector2(transform.position.x, ground.collider.transform.position.y + (ground.collider.bounds.size.y / 2));
                     }
                 }
-                Debug.Log("ground set");
+                //Debug.Log("ground set");
                 destination = new Point(pos, false);
             }
         }
@@ -515,7 +521,7 @@ public class SnailScript : EnemyBase
 
     private Vector2[] GetWalkInfo()
     {
-        Debug.Log("Getting walk info");
+        //Debug.Log("Getting walk info");
 
         Vector2[] points = new Vector2[2];
 
@@ -532,7 +538,7 @@ public class SnailScript : EnemyBase
 
             if (left != null)
             {
-                Debug.Log("Left boundary hit");
+                //Debug.Log("Left boundary hit");
                 points[0] = new Vector2(left.position.x + (left.sizeX / 2) + (coll.size.x / 2), points[0].y);
             }
             else
@@ -544,7 +550,7 @@ public class SnailScript : EnemyBase
 
             if (right != null)
             {
-                Debug.Log("Right Boundary hit");
+                //Debug.Log("Right Boundary hit");
                 points[1] = new Vector2(right.position.x - (right.sizeX / 2) - (coll.size.x / 2), points[0].y);
             }
             else
@@ -554,7 +560,7 @@ public class SnailScript : EnemyBase
 
             for (int i = 0; i != points.Length; ++i)
             {
-                Debug.Log(i + ": x = " + points[i].x + ", y = " + points[i].y);
+                //Debug.Log(i + ": x = " + points[i].x + ", y = " + points[i].y);
             }
 
             return points;
