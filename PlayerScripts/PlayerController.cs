@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour {
 
             //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
 
-            if (ground)
+            if (ground && ground.collider.gameObject.tag != "CollInactive")
             {
                 grounded = true;
                 doubleJump = false;
