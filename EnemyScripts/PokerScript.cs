@@ -136,7 +136,7 @@ public class PokerScript : EnemyBase
         {
             //Debug.Log("Collision with Player");
 
-            playerController.GetHurt();
+            playerController.GetHurt(transform.position);
         }
     }
 

@@ -94,6 +94,10 @@ public class WorldSwitcher : MonoBehaviour {
                     enemyRend.Add(worldColliders[i][j]);
                     worldColliders[i][j] = null;
                 }
+                else if(worldColliders[i][j].tag == "WaterCollider")
+                {
+                    worldColliders[i][j] = null;
+                }
             }
 
             enemyColliders[i] = ConvertList(enemyRend);
@@ -147,9 +151,13 @@ public class WorldSwitcher : MonoBehaviour {
 
         for (int j = 0; j != worldColliders[i].Length; ++j)
         {
-            worldColliders[i][j].isTrigger = false;
+            
             worldColliders[i][j].tag = "CollActive";
-            worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("Ground");
+            if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Water"))
+            {
+                worldColliders[i][j].isTrigger = false;
+                worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("Ground");
+            }
         }
 
         for(int j = 0; j != enemyColliders[i].Length; ++j)
@@ -161,9 +169,15 @@ public class WorldSwitcher : MonoBehaviour {
         {
             for (int j = 0; j != worldColliders[activeWorldNum].Length; ++j)
             {
-                worldColliders[activeWorldNum][j].isTrigger = true;
-                worldColliders[activeWorldNum][j].tag = "CollInactive";
-                worldColliders[activeWorldNum][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
+                if (worldColliders[activeWorldNum][j] != null)
+                {
+                    worldColliders[activeWorldNum][j].tag = "CollInactive";
+                    if (worldColliders[activeWorldNum][j].gameObject.layer != LayerMask.NameToLayer("Water"))
+                    {
+                        worldColliders[activeWorldNum][j].isTrigger = true;
+                        worldColliders[activeWorldNum][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
+                    }
+                }
             }
 
             for(int j = 0; j != enemyColliders[activeWorldNum].Length; ++j)
@@ -323,9 +337,13 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 for (int j = 0; j != worldColliders[i].Length; ++j)
                 {
-                    worldColliders[i][j].isTrigger = true; //change made here
+                    
                     worldColliders[i][j].tag = "CollInactive";
-                    worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
+                    if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Water"))
+                    {
+                        worldColliders[i][j].isTrigger = true; //change made here
+                        worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
+                    }
                 }
             }
         }

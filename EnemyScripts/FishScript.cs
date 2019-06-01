@@ -95,7 +95,7 @@ public class FishScript : EnemyBase
         {
             //Debug.Log("Collision with Player");
 
-            playerController.GetHurt();
+            playerController.GetHurt(transform.position);
 
             //set damage here as well;
         }

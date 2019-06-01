@@ -50,14 +50,19 @@ public class SnailScript : EnemyBase
         startHealth = health;
     }
 
+    private void FixedUpdate()
+    {
+        SwitchLayerString();
+        CheckDistance();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        SwitchLayerString();
         CheckHealth();
         FlipSprites();
         SetWalkMethod();
-        CheckDistance();
+        
         if (withinDistance == false && isDead == false)
         {
             anim.SetBool("IsNear", false);
@@ -181,7 +186,7 @@ public class SnailScript : EnemyBase
     {
         if(collision.gameObject.tag == "Player")
         {
-            playerController.GetHurt();
+            playerController.GetHurt(coll.transform.position);
         }
     }
 

@@ -135,7 +135,7 @@ public class SlimeScript : EnemyBase
         Debug.Log("Collision detected");
         if (collision.gameObject.tag == "Player")
         {
-            playerController.GetHurt();
+            playerController.GetHurt(coll.transform.position);
         }
     }
 
@@ -147,7 +147,7 @@ public class SlimeScript : EnemyBase
         }
         else if(collision.gameObject.tag == "Player")
         {
-            playerController.GetHurt();
+            playerController.GetHurt(coll.transform.position);
         }
     }
 

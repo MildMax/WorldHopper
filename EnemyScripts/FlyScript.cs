@@ -85,7 +85,7 @@ public class FlyScript : EnemyBase
         {
             //Debug.Log("Collision with Player");
 
-            playerController.GetHurt();
+            playerController.GetHurt(coll.transform.position);
 
             //set damage here as well;
         }

@@ -144,6 +144,7 @@ public class PlayerController : MonoBehaviour {
     bool waterVel = false;
 
     bool waterSpeed = false;
+    bool belowEnemy = false;
 
     InputManager IM;
 
@@ -197,13 +198,23 @@ public class PlayerController : MonoBehaviour {
             //PerformKeyPresses();
             UmbrellaDeployed();
         }
-        else if (isHurt == true && inWater == false)
+        else if (isHurt == true && inWater == false && belowEnemy == false)
         {
             //Debug.Log("get hurt");
             KillDashOnHurt();
             body.velocity = Vector2.zero;
             body.AddForce(new Vector2(-direction * hurtForce, yHurtForce));
             StartCoroutine(CheckHurtHeight(body.position.x, body.position.y));
+            isHurt = false;
+        }
+        else if (isHurt == true && inWater == false && belowEnemy == true)
+        {
+            //Debug.Log("get hurt");
+            KillDashOnHurt();
+            body.velocity = Vector2.zero;
+            body.AddForce(new Vector2(-direction * hurtForce, yHurtForce));
+            StartCoroutine(BelowHurtTime());
+            belowEnemy = false;
             isHurt = false;
         }
         else if(isHurt == true && inWater == true)
@@ -236,6 +247,12 @@ public class PlayerController : MonoBehaviour {
     private IEnumerator WaterHurtTime()
     {
         yield return new WaitForSeconds(1);
+        playerAnimScript.hurt = false;
+    }
+
+    private IEnumerator BelowHurtTime()
+    {
+        yield return new WaitForSeconds(0.5f);
         playerAnimScript.hurt = false;
     }
 
@@ -627,10 +644,15 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void GetHurt()
+    public void GetHurt(Vector2 pos)
     {
         isHurt = true;
         playerAnimScript.hurt = true;
+
+        if (transform.position.y < pos.y)
+        {
+            belowEnemy = true;
+        }
     }
 
 }
