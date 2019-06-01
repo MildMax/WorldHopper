@@ -149,6 +149,7 @@ public class WorldSwitcher : MonoBehaviour {
         {
             worldColliders[i][j].isTrigger = false;
             worldColliders[i][j].tag = "CollActive";
+            worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("Ground");
         }
 
         for(int j = 0; j != enemyColliders[i].Length; ++j)
@@ -162,6 +163,7 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 worldColliders[activeWorldNum][j].isTrigger = true;
                 worldColliders[activeWorldNum][j].tag = "CollInactive";
+                worldColliders[activeWorldNum][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
             }
 
             for(int j = 0; j != enemyColliders[activeWorldNum].Length; ++j)
@@ -323,6 +325,7 @@ public class WorldSwitcher : MonoBehaviour {
                 {
                     worldColliders[i][j].isTrigger = true; //change made here
                     worldColliders[i][j].tag = "CollInactive";
+                    worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive");
                 }
             }
         }

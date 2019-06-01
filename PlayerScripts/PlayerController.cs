@@ -266,12 +266,17 @@ public class PlayerController : MonoBehaviour {
 
             //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
 
-            if (ground && ground.collider.gameObject.tag != "CollInactive")
+            if (ground)
             {
-                grounded = true;
-                doubleJump = false;
-                airDash = false;
-                //runAtTimeOfJump = false;
+                //Debug.Log(ground.collider.gameObject.tag);
+                if (ground.collider.gameObject.tag == "CollActive")
+                {
+                    //Debug.Log("Ground found, collInactive true");
+                    grounded = true;
+                    doubleJump = false;
+                    airDash = false;
+                    //runAtTimeOfJump = false;
+                }
             }
             else
             {
