@@ -147,7 +147,8 @@ public class WorldSwitcher : MonoBehaviour {
 
         for (int j = 0; j != worldColliders[i].Length; ++j)
         {
-            worldColliders[i][j].enabled = true;
+            worldColliders[i][j].isTrigger = false;
+            worldColliders[i][j].tag = "CollActive";
         }
 
         for(int j = 0; j != enemyColliders[i].Length; ++j)
@@ -159,7 +160,8 @@ public class WorldSwitcher : MonoBehaviour {
         {
             for (int j = 0; j != worldColliders[activeWorldNum].Length; ++j)
             {
-                worldColliders[activeWorldNum][j].enabled = false;
+                worldColliders[activeWorldNum][j].isTrigger = true;
+                worldColliders[activeWorldNum][j].tag = "CollInactive";
             }
 
             for(int j = 0; j != enemyColliders[activeWorldNum].Length; ++j)
@@ -319,7 +321,8 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 for (int j = 0; j != worldColliders[i].Length; ++j)
                 {
-                    worldColliders[i][j].enabled = false;
+                    worldColliders[i][j].isTrigger = true; //change made here
+                    worldColliders[i][j].tag = "CollInactive";
                 }
             }
         }
