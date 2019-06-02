@@ -150,6 +150,8 @@ public class PlayerController : MonoBehaviour {
 
     WorldSwitcher worldSwitcher;
 
+    Vector3 halfCollSize; 
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -161,7 +163,7 @@ public class PlayerController : MonoBehaviour {
         direction = awakeDirection;
         IM = GetComponent<InputManager>();
         worldSwitcher = GetComponentInChildren<WorldSwitcher>();
-
+        halfCollSize = new Vector3(capsuleCollider.size.x / 2, 0f, 0f);
         offset = transform.position.x - previousDirection;
     }
 
@@ -282,12 +284,40 @@ public class PlayerController : MonoBehaviour {
     {
         if (groundedFrames >= 1)
         {
-            ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            Vector3 leftPos = capsuleCollider.transform.position - halfCollSize;                
+            RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+            Vector3 rightPos = capsuleCollider.transform.position + halfCollSize;
+            RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+            RaycastHit2D mid = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+            //Debug.DrawRay(leftPos, -Vector2.up);
+            //Debug.DrawRay(rightPos, -Vector2.up);
+            //Debug.DrawRay(capsuleCollider.transform.position, -Vector2.up);
+
+            //ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
             //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
 
-            if (ground)
+            if (mid || left || right)
             {
+                if(mid)
+                {
+                    //Debug.Log("Mid set");
+                    ground = mid;
+                }
+                else if(left)
+                {
+                    //Debug.Log("Left set");
+                    ground = left;
+                }
+                else if(right)
+                {
+                    //Debug.Log("Right set");
+                    ground = right;
+                }
+
                 //Debug.Log(ground.collider.gameObject.tag);
                 if (ground.collider.gameObject.tag == "CollActive")
                 {
