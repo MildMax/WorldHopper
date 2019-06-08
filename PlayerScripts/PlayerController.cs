@@ -150,7 +150,8 @@ public class PlayerController : MonoBehaviour {
 
     WorldSwitcher worldSwitcher;
 
-    Vector3 halfCollSize; 
+    Vector3 halfCollSizeX;
+    Vector3 halfCollSizeY;
 
     private void Awake()
     {
@@ -163,7 +164,8 @@ public class PlayerController : MonoBehaviour {
         direction = awakeDirection;
         IM = GetComponent<InputManager>();
         worldSwitcher = GetComponentInChildren<WorldSwitcher>();
-        halfCollSize = new Vector3(capsuleCollider.size.x / 2, 0f, 0f);
+        halfCollSizeX = new Vector3((capsuleCollider.size.x / 2) - (capsuleCollider.size.x / 10), 0f, 0f);
+        halfCollSizeY = new Vector3(0f, capsuleCollider.size.y / 2, 0f);
         offset = transform.position.x - previousDirection;
     }
 
@@ -284,17 +286,17 @@ public class PlayerController : MonoBehaviour {
     {
         if (groundedFrames >= 1)
         {
-            Vector3 leftPos = capsuleCollider.transform.position - halfCollSize;                
-            RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            Vector3 leftPos = capsuleCollider.transform.position - halfCollSizeX - halfCollSizeY;                
+            RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            Vector3 rightPos = capsuleCollider.transform.position + halfCollSize;
-            RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            Vector3 rightPos = capsuleCollider.transform.position + halfCollSizeX - halfCollSizeY;
+            RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            RaycastHit2D mid = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            RaycastHit2D mid = Physics2D.Raycast(capsuleCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            //Debug.DrawRay(leftPos, -Vector2.up);
-            //Debug.DrawRay(rightPos, -Vector2.up);
-            //Debug.DrawRay(capsuleCollider.transform.position, -Vector2.up);
+            Debug.DrawRay(leftPos, -Vector2.up);
+            Debug.DrawRay(rightPos, -Vector2.up);
+            Debug.DrawRay(capsuleCollider.transform.position - halfCollSizeY, -Vector2.up);
 
             //ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
