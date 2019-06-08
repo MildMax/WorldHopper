@@ -41,6 +41,7 @@ public class SnailScript : EnemyBase
     bool isDead = false;
     bool deathRoutine = false;
 
+    [HideInInspector]
     public string layer;
 
     private void Awake()

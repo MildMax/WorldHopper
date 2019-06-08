@@ -20,6 +20,7 @@ public class BlockerScript : EnemyBase
         rend = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        //Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Item"));
         endHealth = health;
     }
 

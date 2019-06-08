@@ -5,6 +5,4 @@ using UnityEngine;
 public class EnemyBase : MonoBehaviour
 {
     public int health;
-    public bool bombAffector = false;
-
 }

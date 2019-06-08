@@ -22,7 +22,6 @@ public class SlimeScript : EnemyBase
     public delegate void WalkMethod();
     public WalkMethod walkType;
 
-    //[SerializeField]
     [HideInInspector]
     public int walkIndex;
 
@@ -46,7 +45,6 @@ public class SlimeScript : EnemyBase
         anim = GetComponent<Animator>();
         autoWalkPoints = SetAutoWalk();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        //IgnoreLayerCollisions();
     }
 
     private void Update()
@@ -135,7 +133,7 @@ public class SlimeScript : EnemyBase
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Collision detected");
+        //Debug.Log("Collision detected");
         if (collision.gameObject.tag == "Player")
         {
             playerController.GetHurt(coll.transform.position);

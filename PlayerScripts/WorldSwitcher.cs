@@ -71,7 +71,7 @@ public class WorldSwitcher : MonoBehaviour {
 
             for (int j = 0; j != worldRenderers[i].Length; ++j)
             {
-                if(worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                if(worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                 {
                     enemyRend.Add(worldRenderers[i][j]);
                     worldRenderers[i][j] = null;
