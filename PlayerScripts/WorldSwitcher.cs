@@ -122,11 +122,6 @@ public class WorldSwitcher : MonoBehaviour {
 
         //Debug.Log("worldRenderers[0] length after removal: " + worldRenderers[0].Length);
         //Debug.Log("enemyRenderers[0] length: " + enemyRenderers[0].Length);
-
-        //while (worlds.Count != 4)
-        //{
-        //    worlds.Add(null);
-        //}
     }
 
     public void Switcher()
@@ -178,11 +173,6 @@ public class WorldSwitcher : MonoBehaviour {
             }
         }
 
-        //for(int j = 0; j != enemyColliders[i].Count; ++j)
-        //{
-        //    enemyColliders[i][j].enabled = true;
-        //}
-
         foreach(KeyValuePair<string, Collider2D> j in enemyColliders[i])
         {
             j.Value.enabled = true;
@@ -206,11 +196,6 @@ public class WorldSwitcher : MonoBehaviour {
                     }
                 }
             }
-
-            //for(int j = 0; j != enemyColliders[activeWorldNum].Count; ++j)
-            //{
-            //    enemyColliders[activeWorldNum][j].enabled = false;
-            //}
 
             foreach(KeyValuePair<string, Collider2D> j in enemyColliders[activeWorldNum])
             {
@@ -492,25 +477,6 @@ public class WorldSwitcher : MonoBehaviour {
         }
     }
 
-    //public void ResizeEnemyArray()
-    //{
-    //    if (enemyDestroyed == true)
-    //    {
-    //        Debug.Log("Before: " + enemyColliders[0].Count);
-    //        for(int i = 0; i != enemyColliders.Length; ++i)
-    //        {
-    //            //enemyColliders[i] = ResizeArray(enemyColliders[i]);
-    //        }
-
-    //        //Debug.Log("After: " + enemyColliders[0].Length);
-    //        for(int i = 0; i != enemyRenderers.Length; ++i)
-    //        {
-    //            enemyRenderers[i] = ResizeArray(enemyRenderers[i]);
-    //        }
-    //        enemyDestroyed = false;
-    //    }
-    //}
-
     private T[] ResizeArray<T>(T[] t)
     {
         int len = 0;
@@ -551,104 +517,4 @@ public class WorldSwitcher : MonoBehaviour {
         return newT;
     }
     
-
-    //private void Awake()
-    //{
-    //    for (int i = 1; i != 5; ++i)
-    //    {
-    //        if (GameObject.FindGameObjectWithTag("World" + i))
-    //        {
-    //            worlds.Add(GameObject.FindGameObjectWithTag("World" + i));
-    //        }
-    //        else
-    //        {
-    //            break;
-    //        }
-    //    }
-
-    //    for(int i = 0; i != worlds.Count; ++i)
-    //    {
-    //        hardWorlds[i] = worlds[i].transform.GetChild(0).gameObject;
-    //        hardWorlds[i].SetActive(false);
-
-    //        softWorlds[i] = worlds[i].transform.GetChild(1).gameObject;
-    //        softWorlds[i].SetActive(false);
-    //    }
-
-    //    activeWorld = hardWorlds[0];
-
-    //    activeWorld.SetActive(true);
-
-    //    //Debug.Log(worlds.Count);
-    //}
-
-    //private void Update()
-    //{
-    //    //y = Input.GetAxisRaw("RJY");
-    //    Switcher();
-    //    Preview();
-    //}
-
-    //private void Switcher()
-    //{
-    //    if (Mathf.Abs(Input.GetAxis("RJX")) > Mathf.Abs(Input.GetAxis("RJY")))
-    //    {
-    //        if (Input.GetAxisRaw("RJX") < 0 && activeWorld != hardWorlds[0] && hardWorlds[0] != null)
-    //        {
-    //            SetActiveWorld(0);
-    //        }
-    //        else if (Input.GetAxisRaw("RJX") > 0 && activeWorld != hardWorlds[2] && hardWorlds[2] != null)
-    //        {
-    //            SetActiveWorld(2);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        if (Input.GetAxisRaw("RJY") < 0 && activeWorld != hardWorlds[1] && hardWorlds[1] != null)
-    //        {
-    //            SetActiveWorld(1);
-    //        }
-    //        else if (Input.GetAxisRaw("RJY") > 0 && activeWorld != hardWorlds[3] && hardWorlds[3] != null)
-    //        {
-    //            SetActiveWorld(3);
-    //        }
-    //    }
-    //}
-
-    //private void SetActiveWorld(int i)
-    //{
-    //    activeWorld.SetActive(false);
-    //    activeWorld = hardWorlds[i];
-    //    activeWorld.SetActive(true);
-    //}
-
-    //private void Preview()
-    //{
-    //    if(Input.GetAxisRaw("DPadX") < 0 && softWorlds[0] != null)
-    //    {
-    //        softWorlds[0].SetActive(true);
-    //    }
-    //    else if(Input.GetAxisRaw("DPadX") > 0 && softWorlds[2] != null)
-    //    {
-    //        softWorlds[2].SetActive(true);
-    //    }
-    //    else if(Input.GetAxisRaw("DPadY") > 0 && softWorlds[1] != null)
-    //    {
-    //        softWorlds[1].SetActive(true);
-    //    }
-    //    else if(Input.GetAxisRaw("DPadY") < 0 && softWorlds[3] != null)
-    //    {
-    //        softWorlds[3].SetActive(true);
-    //    }
-    //    else
-    //    {
-    //        for (int i = 0; i != softWorlds.Length; ++i)
-    //        {
-    //            if(softWorlds[i] != null && softWorlds[i].activeSelf == true)
-    //            {
-    //                softWorlds[i].SetActive(false);
-    //            }
-    //        }
-    //    }
-    //}
 }
