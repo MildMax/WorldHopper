@@ -5,4 +5,6 @@ using UnityEngine;
 public class EnemyBase : MonoBehaviour
 {
     public int health;
+    //[HideInInspector]
+    public string hash;
 }

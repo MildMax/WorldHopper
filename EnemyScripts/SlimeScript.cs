@@ -175,7 +175,7 @@ public class SlimeScript : EnemyBase
     private IEnumerator KillWait()
     {
         yield return new WaitForSeconds(2.5f);
-        wS.enemyDestroyed = true;
+        wS.DestroyEnemyValue(hash);
         Destroy(gameObject);
     }
 

@@ -146,7 +146,7 @@ public class PokerScript : EnemyBase
     {
         if(health <= 0)
         {
-            wS.enemyDestroyed = true;
+            wS.DestroyEnemyValue(hash);
             Destroy(gameObject);
         }
     }

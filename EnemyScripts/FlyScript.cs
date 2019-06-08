@@ -123,7 +123,7 @@ public class FlyScript : EnemyBase
     private IEnumerator KillSequence()
     {
         yield return new WaitForSeconds(2.5f);
-        wS.enemyDestroyed = true;
+        wS.DestroyEnemyValue(hash);
         Destroy(gameObject);
     }
 }

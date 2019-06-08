@@ -86,7 +86,7 @@ public class FishScript : EnemyBase
     private IEnumerator DestroyFish()
     {
         yield return new WaitForSeconds(2);
-        wS.enemyDestroyed = true;
+        wS.DestroyEnemyValue(hash);
         Destroy(gameObject);
     }
 

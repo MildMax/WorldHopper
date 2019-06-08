@@ -12,7 +12,7 @@ public class ShotScript : MonoBehaviour {
     Rigidbody2D body;
     PlayerController playerController;
 
-    string[] tags = { "Boundary", "Player", "PlayerChild", "Shot", "WaterCollider" };
+    string[] tags = { "Boundary", "Player", "PlayerChild", "Shot", "WaterCollider", "CollInactive" };
 
     private void Awake()
     {
