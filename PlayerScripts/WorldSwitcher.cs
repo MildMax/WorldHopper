@@ -27,6 +27,11 @@ public class WorldSwitcher : MonoBehaviour {
 
     InputManager IM;
 
+    //for reseting colliders after destroy enemy and world switch
+    [HideInInspector]
+    public bool enemyDestroyed = false;
+ 
+
     //public float x;
     //public float y;
 
@@ -89,7 +94,7 @@ public class WorldSwitcher : MonoBehaviour {
             for (int j = 0; j != worldColliders[i].Length; ++j)
             {
                 //Debug.Log("Layermask.GetMask(\"Enemy\"): " + (1 << 9) + "-- worldColliders[i][j].gameObject.layer: " + worldColliders[i][j].gameObject.layer);
-                if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy"))
+                if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                 {
                     enemyRend.Add(worldColliders[i][j]);
                     worldColliders[i][j] = null;
@@ -118,6 +123,8 @@ public class WorldSwitcher : MonoBehaviour {
 
     public void Switcher()
     {
+        ResizeEnemyArray();
+
         if (Mathf.Abs(Input.GetAxis(IM.changeX)) > Mathf.Abs(Input.GetAxis(IM.changeY)))
         {
             if (Input.GetAxisRaw(IM.changeX) < 0 && activeWorld != worlds[0] && worlds[0] != null)
@@ -435,6 +442,24 @@ public class WorldSwitcher : MonoBehaviour {
                 BGRenderers[i] = ConvertList(tempList);
                 worldRenderers[i] = ResizeArray(worldRenderers[i]);
             }
+        }
+    }
+
+    public void ResizeEnemyArray()
+    {
+        if (enemyDestroyed == true)
+        {
+            Debug.Log("Before: " + enemyColliders[0].Length);
+            for(int i = 0; i != enemyColliders.Length; ++i)
+            {
+                enemyColliders[i] = ResizeArray(enemyColliders[i]);
+            }
+            Debug.Log("After: " + enemyColliders[0].Length);
+            for(int i = 0; i != enemyRenderers.Length; ++i)
+            {
+                enemyRenderers[i] = ResizeArray(enemyRenderers[i]);
+            }
+            enemyDestroyed = false;
         }
     }
 

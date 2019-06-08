@@ -36,6 +36,7 @@ public class SnailScript : EnemyBase
 
     PlayerController playerController;
     Transform playerTransform;
+    WorldSwitcher wS;
 
     bool withinDistance = false;
     bool isDead = false;
@@ -50,6 +51,7 @@ public class SnailScript : EnemyBase
         coll = GetComponent<CapsuleCollider2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         anim = GetComponent<Animator>();
         startHealth = health;
     }
@@ -168,6 +170,7 @@ public class SnailScript : EnemyBase
     {
         if(health <= 0)
         {
+            wS.enemyDestroyed = true;
             isDead = true;
         }
     }

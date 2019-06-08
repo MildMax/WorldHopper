@@ -14,6 +14,7 @@ public class SlimeScript : EnemyBase
     Rigidbody2D body;
     Vector2[] autoWalkPoints = new Vector2[3] { Vector2.positiveInfinity, Vector2.positiveInfinity, Vector2.positiveInfinity };
     Vector2[] autoWalkExtents = new Vector2[2];
+    WorldSwitcher wS;
 
     int direction = 1;
     bool isDead = false;
@@ -21,7 +22,7 @@ public class SlimeScript : EnemyBase
     //serialize/gui shite
     public delegate void WalkMethod();
     public WalkMethod walkType;
-
+ 
     [HideInInspector]
     public int walkIndex;
 
@@ -43,6 +44,7 @@ public class SlimeScript : EnemyBase
         rend = GetComponent<SpriteRenderer>();
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         autoWalkPoints = SetAutoWalk();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
     }
@@ -173,6 +175,7 @@ public class SlimeScript : EnemyBase
     private IEnumerator KillWait()
     {
         yield return new WaitForSeconds(2.5f);
+        wS.enemyDestroyed = true;
         Destroy(gameObject);
     }
 

@@ -40,6 +40,7 @@ public class PokerScript : EnemyBase
     SpriteRenderer rend;
     Transform player;
     PlayerController playerController;
+    WorldSwitcher wS;
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
@@ -51,6 +52,7 @@ public class PokerScript : EnemyBase
         rend = GetComponent<SpriteRenderer>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         SetActionMethod();
         actionMethod();
         //Debug.Log(actionIndex);
@@ -144,6 +146,7 @@ public class PokerScript : EnemyBase
     {
         if(health <= 0)
         {
+            wS.enemyDestroyed = true;
             Destroy(gameObject);
         }
     }

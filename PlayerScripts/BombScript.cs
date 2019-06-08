@@ -82,7 +82,7 @@ public class BombScript : MonoBehaviour {
 
         if (worldSwitcher.activeWorldNum != worldNum)
         {
-            Debug.Log("Unfreezing constraints");
+            //Debug.Log("Unfreezing constraints");
             body.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
             body.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
             worldNum = worldSwitcher.activeWorldNum;

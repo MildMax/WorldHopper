@@ -19,6 +19,7 @@ public class FishScript : EnemyBase
     Animator anim;
     Rigidbody2D body;
     PlayerController playerController;
+    WorldSwitcher wS;
 
     private void Awake()
     {
@@ -27,6 +28,7 @@ public class FishScript : EnemyBase
         anim = GetComponent<Animator>();
         body = GetComponent<Rigidbody2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
     }
 
     private void Update()
@@ -77,8 +79,15 @@ public class FishScript : EnemyBase
             anim.SetBool("IsDead", true);
             isDead = true;
             body.isKinematic = false;
-            Destroy(gameObject, 2);
+            StartCoroutine(DestroyFish());
         }
+    }
+
+    private IEnumerator DestroyFish()
+    {
+        yield return new WaitForSeconds(2);
+        wS.enemyDestroyed = true;
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

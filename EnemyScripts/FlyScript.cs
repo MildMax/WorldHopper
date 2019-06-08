@@ -15,6 +15,7 @@ public class FlyScript : EnemyBase
     Rigidbody2D body;
     CapsuleCollider2D coll;
     PlayerController playerController;
+    WorldSwitcher wS;
 
     bool isDead = false;
 
@@ -26,6 +27,7 @@ public class FlyScript : EnemyBase
         body = GetComponent<Rigidbody2D>();
         coll = GetComponent<CapsuleCollider2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
     }
 
     private void Update()
@@ -121,6 +123,7 @@ public class FlyScript : EnemyBase
     private IEnumerator KillSequence()
     {
         yield return new WaitForSeconds(2.5f);
+        wS.enemyDestroyed = true;
         Destroy(gameObject);
     }
 }

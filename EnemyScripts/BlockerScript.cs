@@ -14,13 +14,14 @@ public class BlockerScript : EnemyBase
     SpriteRenderer rend;
     Animator animator;
     PlayerController playerController;
+    WorldSwitcher wS;
 
     private void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        //Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Item"));
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         endHealth = health;
     }
 
@@ -62,6 +63,7 @@ public class BlockerScript : EnemyBase
     {
         if (health <= 0)
         {
+            wS.enemyDestroyed = true;
             Destroy(gameObject);
         }
     }
