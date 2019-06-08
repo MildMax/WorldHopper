@@ -57,6 +57,8 @@ public class PlayerExecutor : MonoBehaviour
 
         ShootU();
         ThrowBombU();
+
+        ShieldScriptU();
     }
 
     private void LateUpdate()
