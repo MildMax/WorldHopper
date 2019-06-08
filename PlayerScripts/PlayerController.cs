@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviour {
 
     //used in CheckIfGrounded() function for position and height of raycast
     //used in CheckDistanceToGround() function for "" "" "" "" ""
-    CapsuleCollider2D capsuleCollider;
+    BoxCollider2D boxCollider;
 
     //taken from child object Items
     //used in DeployUmbrella()
@@ -156,7 +156,7 @@ public class PlayerController : MonoBehaviour {
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         //itemSwitcher = GetComponentInChildren<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
         playerAnimScript = GetComponent<PlayerAnimationScript>();
@@ -164,8 +164,8 @@ public class PlayerController : MonoBehaviour {
         direction = awakeDirection;
         IM = GetComponent<InputManager>();
         worldSwitcher = GetComponentInChildren<WorldSwitcher>();
-        halfCollSizeX = new Vector3((capsuleCollider.size.x / 2) - (capsuleCollider.size.x / 10), 0f, 0f);
-        halfCollSizeY = new Vector3(0f, capsuleCollider.size.y / 2, 0f);
+        halfCollSizeX = new Vector3((boxCollider.size.x / 2) - (boxCollider.size.x / 10), 0f, 0f);
+        halfCollSizeY = new Vector3(0f, boxCollider.size.y / 2, 0f);
         offset = transform.position.x - previousDirection;
     }
 
@@ -286,21 +286,21 @@ public class PlayerController : MonoBehaviour {
     {
         if (groundedFrames >= 1)
         {
-            Vector3 leftPos = capsuleCollider.transform.position - halfCollSizeX - halfCollSizeY;                
+            Vector3 leftPos = boxCollider.transform.position - halfCollSizeX - halfCollSizeY;                
             RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            Vector3 rightPos = capsuleCollider.transform.position + halfCollSizeX - halfCollSizeY;
+            Vector3 rightPos = boxCollider.transform.position + halfCollSizeX - halfCollSizeY;
             RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            RaycastHit2D mid = Physics2D.Raycast(capsuleCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            RaycastHit2D mid = Physics2D.Raycast(boxCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
             Debug.DrawRay(leftPos, -Vector2.up);
             Debug.DrawRay(rightPos, -Vector2.up);
-            Debug.DrawRay(capsuleCollider.transform.position - halfCollSizeY, -Vector2.up);
+            Debug.DrawRay(boxCollider.transform.position - halfCollSizeY, -Vector2.up);
 
-            //ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+            //ground = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, (boxCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
+            //Debug.DrawLine(boxCollider.transform.position, boxCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(boxCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
 
             if (mid || left || right)
             {
@@ -462,11 +462,11 @@ public class PlayerController : MonoBehaviour {
     {
         if (!grounded)
         {
-            RaycastHit2D distanceToGround = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, capsuleCollider.size.y, LayerMask.GetMask("Ground"));
+            RaycastHit2D distanceToGround = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, boxCollider.size.y, LayerMask.GetMask("Ground"));
 
-            //Debug.DrawRay(transform.position, -Vector2.up * capsuleCollider.size.y, Color.red, 5.0f);
+            //Debug.DrawRay(transform.position, -Vector2.up * boxCollider.size.y, Color.red, 5.0f);
 
-            if (distanceToGround && distanceToGround.distance < capsuleCollider.size.y / 2 + 0.5f && body.velocity.y < 0)
+            if (distanceToGround && distanceToGround.distance < boxCollider.size.y / 2 + 0.5f && body.velocity.y < 0)
             {
                 StartCoroutine(CollisionDetectionWait());
             }
@@ -559,7 +559,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (grounded && hasJumped == false && playerAnimScript.hurt == false)
         {
-            transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (capsuleCollider.size.y / 2));
+            transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2));
         }
     }
 
