@@ -41,6 +41,7 @@ public class PokerScript : EnemyBase
     Transform player;
     PlayerController playerController;
     WorldSwitcher wS;
+    ItemSwitcher itemSwitcher;
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
@@ -53,6 +54,7 @@ public class PokerScript : EnemyBase
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+        itemSwitcher = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<ItemSwitcher>();
         SetActionMethod();
         actionMethod();
         //Debug.Log(actionIndex);
@@ -134,6 +136,7 @@ public class PokerScript : EnemyBase
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        //Debug.Log(collision.gameObject.name);
         if (collision.gameObject.tag == "Player")
         {
             //Debug.Log("Collision with Player");

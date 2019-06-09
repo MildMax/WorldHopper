@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour {
 
     //velocity added during double jump
     //used in Jump() function
-    public float doubleJumpVelocity;
+    public float jumpVelocity;
 
     //Set in CheckIfGrounded() function
     //used to enable jumping in PerformKeyPresses() function
@@ -156,6 +156,7 @@ public class PlayerController : MonoBehaviour {
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         boxCollider = GetComponent<BoxCollider2D>();
         //itemSwitcher = GetComponentInChildren<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
@@ -387,7 +388,7 @@ public class PlayerController : MonoBehaviour {
                 doubleJump = true;
                 //body.velocity = new Vector2(body.velocity.x, doubleJumpVelocity);
                 body.velocity = new Vector2(body.velocity.x, 0);
-                body.AddForce(new Vector2(body.velocity.x, doubleJumpVelocity));
+                body.AddForce(new Vector2(body.velocity.x, jumpVelocity));
             }
             else
             {
@@ -399,7 +400,7 @@ public class PlayerController : MonoBehaviour {
                 }
 
                 //body.velocity = new Vector2(body.velocity.x, doubleJumpVelocity);
-                body.AddForce(new Vector2(body.velocity.x, doubleJumpVelocity));
+                body.AddForce(new Vector2(body.velocity.x, jumpVelocity));
 
             }
         }
@@ -544,7 +545,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (dashRoutine != null && playerAnimScript.hurt == true)
         {
-            Debug.Log("Killing coroutine");
+            //Debug.Log("Killing coroutine");
             StopCoroutine(dashRoutine);
             StopCoroutine(fG);
             noDashJump = false;
@@ -653,12 +654,12 @@ public class PlayerController : MonoBehaviour {
 
         if (inWater == true && waterVel == false)
         {
-            doubleJumpVelocity /= 2.5f;
+            jumpVelocity /= 2.5f;
             waterVel = true;
         }
         else if(inWater == false && waterVel == true)
         {
-            doubleJumpVelocity *= 2.5f;
+            jumpVelocity *= 2.5f;
             waterVel = false;
         }
 

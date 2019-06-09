@@ -60,15 +60,23 @@ public class FishScript : EnemyBase
 
     private void SwitchDirection()
     {
-        if(transform.position.x <= swimPoints[0].x)
+        if(changeDirection == true)
+        {
+            direction *= -1;
+            rend.flipX = !rend.flipX;
+            changeDirection = false;
+        }
+        else if(transform.position.x <= swimPoints[0].x)
         {
             direction = 1;
             rend.flipX = true;
+            changeDirection = false;
         }
         else if(transform.position.x >= swimPoints[1].x)
         {
             direction = -1;
             rend.flipX = false;
+            changeDirection = false;
         }
     }
 
