@@ -113,7 +113,7 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
 
-            //Debug.Log(enemyColliders[i].Count);
+            Debug.Log(enemyColliders[i].Count);
             worldColliders[i] = ResizeArray(worldColliders[i]);
         }
 
@@ -200,6 +200,8 @@ public class WorldSwitcher : MonoBehaviour {
             foreach(KeyValuePair<string, Collider2D> j in enemyColliders[activeWorldNum])
             {
                 j.Value.enabled = false;
+                //Debug.Log(j.Value.gameObject.name);
+                //Debug.Log(j.Value.enabled == true);
             }
         }
 

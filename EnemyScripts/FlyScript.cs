@@ -40,16 +40,18 @@ public class FlyScript : EnemyBase
 
     private void UpdateDirection()
     {
-        if ((Vector2)transform.position == pos2 || changeDirection == true)
+        if(changeDirection == true)
         {
-            direction = -1;
+            direction *= -1;
             changeDirection = false;
-            
         }
-        else if((Vector2)transform.position == pos1 || changeDirection == true)
+        if ((Vector2)transform.position == pos2)
+        {
+            direction = -1;           
+        }
+        else if((Vector2)transform.position == pos1)
         {
             direction = 1;
-            changeDirection = false;
         }
     }
 

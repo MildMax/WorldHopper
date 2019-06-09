@@ -71,7 +71,12 @@ public class SlimeScript : EnemyBase
 
     private void UpdateDirection(Vector2[] points)
     {
-        if ((Vector2)transform.position == points[1])
+        if(changeDirection == true)
+        {
+            direction *= -1;
+            changeDirection = false;
+        }
+        else if ((Vector2)transform.position == points[1])
         {
             direction = -1;
         }

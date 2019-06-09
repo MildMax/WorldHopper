@@ -41,10 +41,11 @@ public class PokerScript : EnemyBase
     Transform player;
     PlayerController playerController;
     WorldSwitcher wS;
-    ItemSwitcher itemSwitcher;
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
+
+    int worldNum;
 
     private void Awake()
     {
@@ -54,18 +55,22 @@ public class PokerScript : EnemyBase
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
-        itemSwitcher = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<ItemSwitcher>();
         SetActionMethod();
         actionMethod();
+        worldNum = GetWorldNum();
         //Debug.Log(actionIndex);
     }
 
     private void Update()
     {
-        CheckHealth();
-        ChangeAnims();
-        SetActionMethod();
-        actionMethod();
+        DeactivateAnimator();
+        if (anim.enabled == true)
+        {
+            CheckHealth();
+            ChangeAnims();
+            SetActionMethod();
+            actionMethod();
+        }
     }
 
     //:::::::::GENERIC::::::::::://
@@ -151,6 +156,44 @@ public class PokerScript : EnemyBase
         {
             wS.DestroyEnemyValue(hash);
             Destroy(gameObject);
+        }
+    }
+
+    private int GetWorldNum()
+    {
+        int num = 10;
+        if (hash != null)
+        {
+            if (hash.Contains("W1"))
+            {
+                num = 0;
+            }
+            else if (hash.Contains("W2"))
+            {
+                num = 1;
+            }
+            else if (hash.Contains("W3"))
+            {
+                num = 2;
+            }
+            else if (hash.Contains("W4"))
+            {
+                num = 3;
+            }
+        }
+        return num;
+        
+    }
+
+    private void DeactivateAnimator()
+    {
+        if(wS.activeWorldNum != worldNum)
+        {
+            anim.enabled = false;
+        }
+        else if(wS.activeWorldNum == worldNum)
+        {
+            anim.enabled = true;
         }
     }
 
