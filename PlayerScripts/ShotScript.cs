@@ -11,13 +11,15 @@ public class ShotScript : MonoBehaviour {
 
     Rigidbody2D body;
     PlayerController playerController;
+    WorldSwitcher wS;
 
-    string[] tags = { "Boundary", "Player", "PlayerChild", "Shot", "WaterCollider", "CollInactive" };
+    string[] tags = { "Player", "PlayerChild", "Shot", "WaterCollider" };
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         if (playerController.direction > 0)
         {
             body.velocity = transform.right * speed;
@@ -50,7 +52,9 @@ public class ShotScript : MonoBehaviour {
             }
         }
 
-        if(coll.gameObject.layer == LayerMask.GetMask("Water") >> 2)
+        if (coll.gameObject.layer == LayerMask.GetMask("Water") >> 2
+            || coll.gameObject.layer == LayerMask.NameToLayer("Ground" + wS.activeWorldNum)
+            || coll.gameObject.layer == LayerMask.NameToLayer("Wall" + wS.activeWorldNum))
         {
             val = false;
         }
