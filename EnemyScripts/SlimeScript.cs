@@ -37,6 +37,8 @@ public class SlimeScript : EnemyBase
     [HideInInspector]
     public int worldNum;
 
+    float oldHealth;
+
     private void Awake()
     {
         SetInitWalk();
@@ -48,6 +50,7 @@ public class SlimeScript : EnemyBase
         autoWalkPoints = SetAutoWalk();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         groundLayer = "Ground" + (worldNum + 1);
+        oldHealth = health;
     }
 
     private void Update()
@@ -175,6 +178,12 @@ public class SlimeScript : EnemyBase
             walkType = NoWalk;
             StartCoroutine(KillWait());
         }
+        else if(oldHealth > health)
+        {
+            anim.SetTrigger("IsHurt");
+        }
+
+        oldHealth = health;
     }
 
     private IEnumerator KillWait()

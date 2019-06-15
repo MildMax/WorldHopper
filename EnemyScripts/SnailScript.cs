@@ -48,6 +48,8 @@ public class SnailScript : EnemyBase
     [HideInInspector]
     public string wallLayer;
 
+    float oldHealth;
+
     private void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
@@ -59,6 +61,7 @@ public class SnailScript : EnemyBase
         groundLayer = "Ground" + (worldNum + 1);
         wallLayer = "Wall" + (worldNum + 1);
         startHealth = health;
+        oldHealth = health;
     }
 
     private void FixedUpdate()
@@ -70,6 +73,7 @@ public class SnailScript : EnemyBase
     // Update is called once per frame
     void Update()
     {
+        HurtForHealth();
         CheckHealth();
         FlipSprites();
         SetWalkMethod();
@@ -170,6 +174,16 @@ public class SnailScript : EnemyBase
         }
     }
 
+    private void HurtForHealth()
+    {
+        if(oldHealth > health)
+        {
+            anim.SetTrigger("IsHurt");
+        }
+
+        oldHealth = health;
+    }
+
     private void CheckHealth()
     {
         if(health <= 0)
@@ -181,17 +195,18 @@ public class SnailScript : EnemyBase
 
     private IEnumerator DeathRoutine()
     {
-        anim.SetBool("IsHurt", true);
+        anim.SetBool("IsDead", true);
         coll.enabled = false;
         deathRoutine = true;
 
         yield return new WaitForSeconds(deathWait);
 
-        anim.SetBool("IsHurt", false);
+        health = startHealth;
+        anim.SetBool("IsDead", false);
         coll.enabled = true;
         isDead = false;
         deathRoutine = false;
-        health = startHealth;
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

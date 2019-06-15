@@ -285,7 +285,7 @@ public class PlayerController : MonoBehaviour {
     //sets bool grounded to true if raycast returns a hit
     public void CheckIfGrounded()
     {
-        Debug.Log("Ground" + (worldSwitcher.activeWorldNum + 1));
+        //Debug.Log("Ground" + (worldSwitcher.activeWorldNum + 1));
 
         Vector3 leftPos = boxCollider.transform.position - halfCollSizeX - halfCollSizeY;                
         RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));

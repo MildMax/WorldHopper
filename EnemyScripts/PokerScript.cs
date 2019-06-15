@@ -44,6 +44,7 @@ public class PokerScript : EnemyBase
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
+    public AnimatorOverrideController controllerHurt;
 
     int worldNum;
 
@@ -67,7 +68,7 @@ public class PokerScript : EnemyBase
         if (anim.enabled == true)
         {
             CheckHealth();
-            ChangeAnims();
+            //ChangeAnims();
             SetActionMethod();
             actionMethod();
         }
@@ -107,17 +108,19 @@ public class PokerScript : EnemyBase
         anim.SetBool("IsContinuous", false);
     }
 
-    private void ChangeAnims()
-    {
-        if(isHurt)
-        {
-            anim.runtimeAnimatorController = controllerSad;
-        }
-        else
-        {
-            anim.runtimeAnimatorController = controllerMad;
-        }
-    }
+    //private void ChangeAnims()
+    //{
+    //    if(isHurt)
+    //    {
+    //        anim.runtimeAnimatorController = controllerSad;
+    //    }
+    //    else
+    //    {
+    //        anim.runtimeAnimatorController = controllerMad;
+    //    }
+    //}
+
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -134,9 +137,17 @@ public class PokerScript : EnemyBase
 
     private IEnumerator HurtTimer()
     {
-        isHurt = true;
-        yield return new WaitForSeconds(1);
-        isHurt = false;
+        //isHurt = true;
+        anim.runtimeAnimatorController = controllerHurt;
+
+        yield return new WaitForSeconds(0.2f);
+
+        anim.runtimeAnimatorController = controllerSad;
+
+        yield return new WaitForSeconds(0.8f);
+
+        anim.runtimeAnimatorController = controllerMad;
+        //isHurt = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

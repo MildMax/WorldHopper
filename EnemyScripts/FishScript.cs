@@ -21,6 +21,8 @@ public class FishScript : EnemyBase
     PlayerController playerController;
     WorldSwitcher wS;
 
+    float oldHealth;
+
     private void Awake()
     {
         transform.position = swimPoints[0];
@@ -29,10 +31,12 @@ public class FishScript : EnemyBase
         body = GetComponent<Rigidbody2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+        oldHealth = health;
     }
 
     private void Update()
     {
+        HealthForHurt();
         CheckHealth();
         if (isDead == false)
         {
@@ -78,6 +82,16 @@ public class FishScript : EnemyBase
             rend.flipX = false;
             changeDirection = false;
         }
+    }
+
+    private void HealthForHurt()
+    {
+        if(oldHealth > health)
+        {
+            anim.SetTrigger("IsHurt");
+        }
+
+        oldHealth = health;
     }
 
     private void CheckHealth()
