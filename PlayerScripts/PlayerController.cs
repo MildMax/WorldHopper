@@ -285,60 +285,50 @@ public class PlayerController : MonoBehaviour {
     //sets bool grounded to true if raycast returns a hit
     public void CheckIfGrounded()
     {
-        if (groundedFrames >= 1)
+        Debug.Log("Ground" + (worldSwitcher.activeWorldNum + 1));
+
+        Vector3 leftPos = boxCollider.transform.position - halfCollSizeX - halfCollSizeY;                
+        RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        Vector3 rightPos = boxCollider.transform.position + halfCollSizeX - halfCollSizeY;
+        RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        RaycastHit2D mid = Physics2D.Raycast(boxCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        Debug.DrawRay(leftPos, -Vector2.up);
+        Debug.DrawRay(rightPos, -Vector2.up);
+        Debug.DrawRay(boxCollider.transform.position - halfCollSizeY, -Vector2.up);
+
+        //ground = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, (boxCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        //Debug.DrawLine(boxCollider.transform.position, boxCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(boxCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
+
+        if (mid || left || right)
         {
-            Vector3 leftPos = boxCollider.transform.position - halfCollSizeX - halfCollSizeY;                
-            RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
-
-            Vector3 rightPos = boxCollider.transform.position + halfCollSizeX - halfCollSizeY;
-            RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
-
-            RaycastHit2D mid = Physics2D.Raycast(boxCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
-
-            Debug.DrawRay(leftPos, -Vector2.up);
-            Debug.DrawRay(rightPos, -Vector2.up);
-            Debug.DrawRay(boxCollider.transform.position - halfCollSizeY, -Vector2.up);
-
-            //ground = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, (boxCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
-
-            //Debug.DrawLine(boxCollider.transform.position, boxCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(boxCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
-
-            if (mid || left || right)
+            if(mid)
             {
-                if(mid)
-                {
-                    //Debug.Log("Mid set");
-                    ground = mid;
-                }
-                else if(left)
-                {
-                    //Debug.Log("Left set");
-                    ground = left;
-                }
-                else if(right)
-                {
-                    //Debug.Log("Right set");
-                    ground = right;
-                }
-
-                //Debug.Log(ground.collider.gameObject.tag);
-                if (ground.collider.gameObject.tag == "CollActive")
-                {
-                    //Debug.Log("Ground found, collInactive true");
-                    grounded = true;
-                    doubleJump = false;
-                    airDash = false;
-                    //runAtTimeOfJump = false;
-                }
+                //Debug.Log("Mid set");
+                ground = mid;
             }
-            else
+            else if(left)
             {
-                grounded = false;
+                //Debug.Log("Left set");
+                ground = left;
+            }
+            else if(right)
+            {
+                //Debug.Log("Right set");
+                ground = right;
             }
 
-            groundedFrames = 0;
+            grounded = true;
+            doubleJump = false;
+            airDash = false;
         }
-        
+        else
+        {
+            grounded = false;
+        } 
     }
 
     //Checks what keys are being pressed
@@ -463,7 +453,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (!grounded)
         {
-            RaycastHit2D distanceToGround = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, boxCollider.size.y, LayerMask.GetMask("Ground"));
+            RaycastHit2D distanceToGround = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, boxCollider.size.y, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
             //Debug.DrawRay(transform.position, -Vector2.up * boxCollider.size.y, Color.red, 5.0f);
 

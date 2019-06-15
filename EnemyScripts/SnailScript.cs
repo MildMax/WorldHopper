@@ -43,7 +43,10 @@ public class SnailScript : EnemyBase
     bool deathRoutine = false;
 
     [HideInInspector]
-    public string layer;
+    public string groundLayer;
+
+    [HideInInspector]
+    public string wallLayer;
 
     private void Awake()
     {
@@ -53,6 +56,8 @@ public class SnailScript : EnemyBase
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         anim = GetComponent<Animator>();
+        groundLayer = "Ground" + (worldNum + 1);
+        wallLayer = "Wall" + (worldNum + 1);
         startHealth = health;
     }
 
@@ -65,7 +70,6 @@ public class SnailScript : EnemyBase
     // Update is called once per frame
     void Update()
     {
-        SwitchLayerString();
         CheckHealth();
         FlipSprites();
         SetWalkMethod();
@@ -206,18 +210,6 @@ public class SnailScript : EnemyBase
         }
     }
 
-    private void SwitchLayerString()
-    {
-        if(coll.enabled == false)
-        {
-            layer = "GroundInactive" + (worldNum + 1);
-        }
-        else if(coll.enabled == true)
-        {
-            layer = "Ground" + (worldNum + 1);
-        }
-    }
-
     //:::::::::::TRAVERSE:::::::::::::://
 
     private void TraverseWalk()
@@ -352,7 +344,7 @@ public class SnailScript : EnemyBase
         Quaternion q = Quaternion.AngleAxis(zRot, Vector3.forward);
         Vector2 dir = q * -Vector2.up;
 
-        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(layer));
+        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(groundLayer));
         //on top of the ground
         if (hit)
         {
@@ -389,7 +381,7 @@ public class SnailScript : EnemyBase
         Quaternion upAffector = Quaternion.AngleAxis(zRot, Vector3.forward);
         Vector2 upDir = upAffector * -Vector2.up;
 
-        RaycastHit2D ground = Physics2D.Raycast(coll.transform.position, upDir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(layer));
+        RaycastHit2D ground = Physics2D.Raycast(coll.transform.position, upDir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(groundLayer));
 
         float dist = new float();
 
@@ -448,7 +440,7 @@ public class SnailScript : EnemyBase
         Debug.DrawRay(coll.transform.position, dir);
         Debug.DrawRay(coll.transform.position, upDir);
 
-        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, dist + 0.1f, LayerMask.GetMask(layer));
+        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, dist + 0.1f, LayerMask.GetMask(groundLayer));
 
         //if shot from transform.position, this collides with the wall it just turned around from, so the offset
         //puts the origin at the front of the sprite depending on direction to avoid this collision with the wall
@@ -465,7 +457,7 @@ public class SnailScript : EnemyBase
         }
 
         Vector2 newPos = new Vector2(coll.transform.position.x + offset, coll.transform.position.y);
-        RaycastHit2D hitWall = Physics2D.Raycast(newPos, dir, dist + 0.1f, LayerMask.GetMask("Wall"));
+        RaycastHit2D hitWall = Physics2D.Raycast(newPos, dir, dist + 0.1f, LayerMask.GetMask(wallLayer));
 
         if(hitWall && !hit)
         {
@@ -601,7 +593,7 @@ public class SnailScript : EnemyBase
 
     private RaycastInfo DoRaycast(Vector2 dir, float dist)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, LayerMask.GetMask(layer));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, LayerMask.GetMask(groundLayer));
         //Debug.Log(hit.)
         if (hit)
         {

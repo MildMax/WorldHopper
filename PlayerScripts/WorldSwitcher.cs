@@ -162,16 +162,10 @@ public class WorldSwitcher : MonoBehaviour {
         for (int j = 0; j != worldColliders[i].Length; ++j)
         {
             
-            worldColliders[i][j].tag = "CollActive";
+            //worldColliders[i][j].tag = "CollActive";
             if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Water"))
             {
                 worldColliders[i][j].isTrigger = false;
-                if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Wall"))
-                {
-                    Debug.Log(worldColliders[i][j].gameObject.name + ":");
-                    Debug.Log(worldColliders[i][j].gameObject.layer.ToString() +  " " + LayerMask.NameToLayer("Wall").ToString());
-                    worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("Ground" + (i + 1));
-                }
             }
         }
 
@@ -186,15 +180,10 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if (worldColliders[activeWorldNum][j] != null)
                 {
-                    worldColliders[activeWorldNum][j].tag = "CollInactive";
+                    //worldColliders[activeWorldNum][j].tag = "CollInactive";
                     if (worldColliders[activeWorldNum][j].gameObject.layer != LayerMask.NameToLayer("Water"))
                     {
                         worldColliders[activeWorldNum][j].isTrigger = true;
-
-                        if (worldColliders[activeWorldNum][j].gameObject.layer != LayerMask.NameToLayer("Wall"))
-                        {
-                            worldColliders[activeWorldNum][j].gameObject.layer = LayerMask.NameToLayer("GroundInactive" + (activeWorldNum + 1));
-                        }
                     }
                 }
             }
@@ -359,13 +348,18 @@ public class WorldSwitcher : MonoBehaviour {
                 for (int j = 0; j != worldColliders[i].Length; ++j)
                 {
                     
-                    worldColliders[i][j].tag = "CollInactive";
+                    //worldColliders[i][j].tag = "CollInactive";
                     if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Water"))
                     {
                         worldColliders[i][j].isTrigger = true; //change made here
-                        if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Wall"))
+                        if (worldColliders[i][j].gameObject.tag != "Wall")
                         {
-                            string temp = "GroundInactive" + (i + 1);
+                            string temp = "Ground" + (i + 1);
+                            worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer(temp);
+                        }
+                        else if(worldColliders[i][j].gameObject.tag == "Wall")
+                        {
+                            string temp = "Wall" + (i + 1);
                             worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer(temp);
                         }
                     }

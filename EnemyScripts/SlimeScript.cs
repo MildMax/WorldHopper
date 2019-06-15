@@ -32,7 +32,7 @@ public class SlimeScript : EnemyBase
 
     bool isGrounded = false;
 
-    public string layer;
+    public string groundLayer;
 
     [HideInInspector]
     public int worldNum;
@@ -47,6 +47,7 @@ public class SlimeScript : EnemyBase
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         autoWalkPoints = SetAutoWalk();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        groundLayer = "Ground" + (worldNum + 1);
     }
 
     private void Update()
@@ -56,7 +57,6 @@ public class SlimeScript : EnemyBase
 
     private void FixedUpdate()
     {
-        SwitchLayerString();
         SetCollisionType();
         SwitchColliderType();
         walkType();
@@ -184,18 +184,6 @@ public class SlimeScript : EnemyBase
         Destroy(gameObject);
     }
 
-    private void SwitchLayerString()
-    {
-        if (coll.enabled == false)
-        {
-            layer = "GroundInactive" + (worldNum + 1);
-        }
-        else if (coll.enabled == true)
-        {
-            layer = "Ground" + (worldNum + 1);
-        }
-    }
-
     //::::::::::::::AUTOWALK:::::::::::::::://
 
     public void AutoWalk()
@@ -229,7 +217,7 @@ public class SlimeScript : EnemyBase
 
         Vector2[] results = new Vector2[3] {Vector2.positiveInfinity, Vector2.positiveInfinity, Vector2.positiveInfinity };
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, (rend.size.y / 2) + 0.25f, LayerMask.GetMask(layer));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, (rend.size.y / 2) + 0.25f, LayerMask.GetMask(groundLayer));
 
         if(hit)
         {
@@ -246,7 +234,7 @@ public class SlimeScript : EnemyBase
 
             //Debug.Log(hit.transform.gameObject.layer.ToString());
 
-            RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, distanceL, LayerMask.GetMask(layer));
+            RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, distanceL, LayerMask.GetMask(groundLayer));
 
             //if(hitLeft)
             //{
@@ -262,7 +250,7 @@ public class SlimeScript : EnemyBase
             //CHECK THIS:::::::::::::::::::::::::
             float distanceR = (hit.transform.position.x - hit.point.x) + hit.collider.bounds.extents.x;
 
-            RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, distanceR, LayerMask.GetMask(layer));
+            RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, distanceR, LayerMask.GetMask(groundLayer));
 
             //if(hitRight)
             //{
