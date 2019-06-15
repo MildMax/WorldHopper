@@ -9,6 +9,7 @@ public class FlyScript : EnemyBase
     public float speed;
 
     int direction = 1;
+    float oldHealth;
 
     SpriteRenderer rend;
     Animator animator;
@@ -28,10 +29,12 @@ public class FlyScript : EnemyBase
         coll = GetComponent<CapsuleCollider2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+        oldHealth = health;
     }
 
     private void Update()
     {
+        HealthForHurt();
         CheckHealth();
         MoveFly();
         UpdateDirection();
@@ -51,7 +54,7 @@ public class FlyScript : EnemyBase
         }
         else if((Vector2)transform.position == pos1)
         {
-            direction = 1;
+            direction = 1; 
         }
     }
 
@@ -106,8 +109,18 @@ public class FlyScript : EnemyBase
         {
             //Debug.Log("Collision with shot");
             health -= collision.gameObject.GetComponent<ShotScript>().damage;
-            CheckHealth();
+            //animator.SetTrigger("IsHurt");
+            //CheckHealth();
         }
+    }
+
+    private void HealthForHurt()
+    {
+        if(oldHealth > health)
+        {
+            animator.SetTrigger("IsHurt");
+        }
+        oldHealth = health;
     }
 
     private void CheckHealth()

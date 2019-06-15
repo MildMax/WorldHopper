@@ -113,7 +113,7 @@ public class WorldSwitcher : MonoBehaviour {
                 }
             }
 
-            Debug.Log(enemyColliders[i].Count);
+            //Debug.Log(enemyColliders[i].Count);
             worldColliders[i] = ResizeArray(worldColliders[i]);
         }
 
@@ -168,6 +168,8 @@ public class WorldSwitcher : MonoBehaviour {
                 worldColliders[i][j].isTrigger = false;
                 if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Wall"))
                 {
+                    Debug.Log(worldColliders[i][j].gameObject.name + ":");
+                    Debug.Log(worldColliders[i][j].gameObject.layer.ToString() +  " " + LayerMask.NameToLayer("Wall").ToString());
                     worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer("Ground" + (i + 1));
                 }
             }
@@ -361,8 +363,11 @@ public class WorldSwitcher : MonoBehaviour {
                     if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Water"))
                     {
                         worldColliders[i][j].isTrigger = true; //change made here
-                        string temp = "GroundInactive" + (i + 1);
-                        worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer(temp);
+                        if (worldColliders[i][j].gameObject.layer != LayerMask.NameToLayer("Wall"))
+                        {
+                            string temp = "GroundInactive" + (i + 1);
+                            worldColliders[i][j].gameObject.layer = LayerMask.NameToLayer(temp);
+                        }
                     }
                 }
             }

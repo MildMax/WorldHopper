@@ -7,7 +7,7 @@ public class SnailScript : EnemyBase
     [HideInInspector]
     public int walkIndex;
 
-    //[HideInInspector]
+    [HideInInspector]
     public int worldNum;
 
     public delegate void WalkMethod();
@@ -32,7 +32,7 @@ public class SnailScript : EnemyBase
 
     Point destination;
     int zRot = 0;
-    bool changeTraverse = false;
+    public bool changeTraverse = false;
 
     PlayerController playerController;
     Transform playerTransform;
