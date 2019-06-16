@@ -42,21 +42,25 @@ public class ShotScript : MonoBehaviour {
 
     private bool CheckObject(Collider2D coll)
     {
-        bool val = true;
+        bool val = false;
 
-        for(int i = 0; i != tags.Length; ++i)
+        //Debug.Log(coll.gameObject.layer.ToString() + " : " + LayerMask.NameToLayer("Ground" + (wS.activeWorldNum + 1)));
+
+        if (coll.gameObject.layer == LayerMask.NameToLayer("Ground" + (wS.activeWorldNum + 1)))
         {
-            if(coll.tag == tags[i])
-            {
-                val = false;
-            }
+            val = true;
         }
-
-        if (coll.gameObject.layer == LayerMask.GetMask("Water") >> 2
-            || coll.gameObject.layer == LayerMask.NameToLayer("Ground" + wS.activeWorldNum)
-            || coll.gameObject.layer == LayerMask.NameToLayer("Wall" + wS.activeWorldNum))
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("Wall" + (wS.activeWorldNum + 1)))
         {
-            val = false;
+            val = true;
+        }
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            val = true;
+        }
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("EnemyB"))
+        {
+            val = true;
         }
 
         return val;
