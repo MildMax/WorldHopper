@@ -20,6 +20,12 @@ public class PokerScript : EnemyBase
     //3: PokerDown
     public AnimationClip[] anims;
 
+    //arrays of sprites for death-flash-sequence in GetDeathStates()
+    public Sprite[] sadSprites;
+    public Sprite[] whiteSprites;
+    Sprite sadSprite;
+    Sprite whiteSprite;
+
     //values for timer-based movement
     public float timer;
     public float delay;
@@ -41,6 +47,7 @@ public class PokerScript : EnemyBase
     Transform player;
     PlayerController playerController;
     WorldSwitcher wS;
+    CapsuleCollider2D coll;
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
@@ -48,26 +55,37 @@ public class PokerScript : EnemyBase
 
     int worldNum;
 
+    float oldHealth;
+    float deathTime;
+    float dTimer = 0;
+    bool deathSet = false;
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
         anim.SetBool("IsDown", true); 
         rend = GetComponent<SpriteRenderer>();
+        coll = GetComponent<CapsuleCollider2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         SetActionMethod();
         actionMethod();
         worldNum = GetWorldNum();
+        oldHealth = health;
+        deathTime = 0.667f * 3;
         //Debug.Log(actionIndex);
     }
 
     private void Update()
     {
-        DeactivateAnimator();
+        CheckHealth();
+        if (deathSet == false)
+        {
+            DeactivateAnimator();
+        }
         if (anim.enabled == true)
         {
-            CheckHealth();
             //ChangeAnims();
             SetActionMethod();
             actionMethod();
@@ -127,11 +145,7 @@ public class PokerScript : EnemyBase
         if(collision.tag == "Shot")
         {
             health -= collision.gameObject.GetComponent<ShotScript>().damage;
-            if(hurtRoutine != null)
-            {
-                StopCoroutine(hurtRoutine);
-            }
-            hurtRoutine = StartCoroutine(HurtTimer());
+            
         }
     }
 
@@ -165,8 +179,46 @@ public class PokerScript : EnemyBase
     {
         if(health <= 0)
         {
-            wS.DestroyEnemyValue(hash);
-            Destroy(gameObject);
+            anim.enabled = false;
+            coll.enabled = false;
+
+            if (deathSet == false)
+            {
+                GetDeathStates();
+                actionMethod = null;
+                StopAllCoroutines();
+                StartCoroutine(DeathSequence());
+                deathSet = true;
+            }
+            
+            if (dTimer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+
+            dTimer += Time.deltaTime;
+        }
+        else if(oldHealth > health && deathSet == false)
+        {
+            if (hurtRoutine != null)
+            {
+                StopCoroutine(hurtRoutine);
+            }
+            hurtRoutine = StartCoroutine(HurtTimer());
+
+            oldHealth = health;
+        }
+    }
+
+    private IEnumerator DeathSequence()
+    {
+        for(int i = 0; i != 3; ++i)
+        {
+            rend.sprite = whiteSprite;
+            yield return new WaitForSeconds(0.33f);
+            rend.sprite = sadSprite;
+            yield return new WaitForSeconds(0.33f);
         }
     }
 
@@ -198,14 +250,71 @@ public class PokerScript : EnemyBase
 
     private void DeactivateAnimator()
     {
-        if(wS.activeWorldNum != worldNum)
+        if (wS.activeWorldNum != worldNum && deathSet == false)
         {
             anim.enabled = false;
         }
-        else if(wS.activeWorldNum == worldNum)
+        else if(wS.activeWorldNum == worldNum && deathSet == false)
         {
             anim.enabled = true;
         }
+    }
+
+    private void GetDeathStates()
+    {
+        Sprite c = rend.sprite;
+        Debug.Log(c.name);
+
+        string num = null;
+
+        for(int i = 0; i != c.name.Length; ++i)
+        {
+            //Debug.Log(c.name[i] + " : " + (int)char.GetNumericValue(c.name[i]));
+            int temp = (int)char.GetNumericValue(c.name[i]);
+
+            if (temp != -1)
+            {
+                num += temp.ToString();
+            }
+        }
+
+        Debug.Log(num);
+
+        if (num != null)
+        {
+            for (int i = 0; i != whiteSprites.Length; ++i)
+            {
+                if (whiteSprites[i].name.Contains(num))
+                {
+                    whiteSprite = whiteSprites[i];
+                    break;
+                }
+            }   
+        }
+        else
+        {
+            whiteSprite = whiteSprites[0];
+        }
+
+        if (num != null)
+        {
+            for (int i = 0; i != sadSprites.Length; ++i)
+            {
+                if (sadSprites[i].name.Contains(num))
+                {
+                    sadSprite = sadSprites[i];
+                    break;
+                }
+            }
+        }
+        else
+        {
+            sadSprite = sadSprites[0]; 
+        }
+
+        Debug.Log(whiteSprite.name);
+        Debug.Log(sadSprite.name);
+
     }
 
     //::::::::::::CONTINOUS::::::::://

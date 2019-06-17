@@ -6,10 +6,14 @@ public class FlyScript : EnemyBase
 {
     public Vector2 pos1;
     public Vector2 pos2;
+    public AnimationClip deathAnim;
     public float speed;
 
     int direction = 1;
     float oldHealth;
+
+    float deathTime;
+    float timer = 0;
 
     SpriteRenderer rend;
     Animator animator;
@@ -19,6 +23,14 @@ public class FlyScript : EnemyBase
     WorldSwitcher wS;
 
     bool isDead = false;
+
+    //for Fall() function
+    RaycastHit2D fallDistance;
+    Vector2 destination;
+    Vector2 vel;
+
+    bool pointSet = false;
+    bool startFall = false;
 
     private void Awake()
     {
@@ -30,15 +42,30 @@ public class FlyScript : EnemyBase
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         oldHealth = health;
+        deathTime = deathAnim.length * 3;
+        RetryHash();
     }
 
     private void Update()
     {
+        RetryHash();
         HealthForHurt();
         CheckHealth();
-        MoveFly();
+        
         UpdateDirection();
         FlipSprite();
+    }
+
+    private void FixedUpdate()
+    {
+        if (startFall == false)
+        {
+            MoveFly();
+        }
+        else
+        {
+            Fall();
+        }
     }
 
     private void UpdateDirection()
@@ -125,20 +152,72 @@ public class FlyScript : EnemyBase
 
     private void CheckHealth()
     {
-        if(health <= 0 && isDead == false)
+        if(health <= 0)
         {
-            animator.SetBool("IsDead", true);
-            body.isKinematic = false;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, 9);
-            StartCoroutine(KillSequence());
-            isDead = true;
+            if (isDead == false)
+            {
+                fallDistance = Physics2D.Raycast(transform.position, -Vector2.up, 150, LayerMask.GetMask("Ground" + layerString));
+                animator.SetBool("IsDead", true);
+                coll.enabled = false;
+                startFall = true;
+                isDead = true;
+            }
+            
+            if(timer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+
+            timer += Time.deltaTime;
         }
     }
 
-    private IEnumerator KillSequence()
+    private void Fall()
     {
-        yield return new WaitForSeconds(2.5f);
-        wS.DestroyEnemyValue(hash);
-        Destroy(gameObject);
+        //Debug.Log("Fly falling");
+
+        if(fallDistance)
+        {
+            //Debug.Log("Falling w/ raycast");
+            if(pointSet == false)
+            {
+                destination = new Vector2(fallDistance.point.x, fallDistance.point.y + (coll.size.y / 2));
+                pointSet = true;
+            }
+
+            if(transform.position.y >= destination.y)
+            {
+                vel += 0.015f * Physics2D.gravity * Time.deltaTime;
+
+                Vector2 d = vel * Time.deltaTime;
+
+                Vector2 m = Vector2.up * vel;
+
+                body.position = body.position + m;
+            }
+            else
+            {
+                body.velocity = Vector2.zero;
+            }
+        }
+        else
+        {
+            //Debug.Log("Falling w/out raycast");
+            vel += 0.015f * Physics2D.gravity * Time.deltaTime;
+
+            Vector2 d = vel * Time.deltaTime;
+
+            Vector2 m = Vector2.up * vel;
+
+            body.position = body.position + m;
+        }
     }
+
+    //private IEnumerator KillSequence()
+    //{
+    //    yield return new WaitForSeconds(2.5f);
+    //    wS.DestroyEnemyValue(hash);
+    //    Destroy(gameObject);
+    //}
 }

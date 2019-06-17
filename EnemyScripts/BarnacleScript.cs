@@ -5,8 +5,14 @@ using UnityEngine;
 public class BarnacleScript : EnemyBase
 {
     public float deathWait;
+    public AnimationClip deathAnim;
 
     float oldHealth;
+
+    float deathTime;
+    float timer = 0;
+
+    bool isDead = false;
 
     Animator anim;
     WorldSwitcher wS;
@@ -18,11 +24,11 @@ public class BarnacleScript : EnemyBase
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         coll = GetComponent<BoxCollider2D>();
         oldHealth = health;
+        deathTime = deathAnim.length * 3;
     }
 
     private void Update()
     {
-        HealthForHurt();
         CheckHealth();
     }
 
@@ -42,31 +48,34 @@ public class BarnacleScript : EnemyBase
         }
     }
 
-    private void HealthForHurt()
-    {
-        if(oldHealth > health)
-        {
-            anim.SetTrigger("IsHurt");
-        }
-
-        oldHealth = health;
-    }
-
     private void CheckHealth()
     {
         if(health <= 0)
         {
-            anim.SetBool("IsDead", true);
-            coll.enabled = false;
-            StartCoroutine(KillSequence());
-        }
-    }
+            if (isDead == false)
+            {
+                anim.SetBool("IsDead", true);
+                coll.enabled = false;
+                isDead = true;
+            }
 
-    private IEnumerator KillSequence()
-    {
-        yield return new WaitForSeconds(deathWait);
-        wS.DestroyEnemyValue(hash);
-        Destroy(gameObject);
+            if(timer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+
+            timer += Time.deltaTime;
+        }
+        else
+        {
+            if (oldHealth > health)
+            {
+                anim.SetTrigger("IsHurt");
+            }
+
+            oldHealth = health;
+        }
     }
 
 }

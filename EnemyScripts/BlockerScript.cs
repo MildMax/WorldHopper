@@ -7,14 +7,21 @@ public class BlockerScript : EnemyBase
     public Sprite idle;
     public Sprite mad;
     public Sprite hurt;
+    public AnimationClip deathAnim;
+
+    float deathTime;
+    float timer = 0f;
 
     public float force;
     public float endHealth;
 
     SpriteRenderer rend;
     Animator animator;
+    BoxCollider2D coll;
     PlayerController playerController;
     WorldSwitcher wS;
+
+    bool deathSet = false;
 
     private void Awake()
     {
@@ -22,6 +29,8 @@ public class BlockerScript : EnemyBase
         animator = GetComponent<Animator>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+        coll = GetComponent<BoxCollider2D>();
+        deathTime = deathAnim.length * 3;
         endHealth = health;
     }
 
@@ -32,11 +41,11 @@ public class BlockerScript : EnemyBase
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Collision detected");
+        //Debug.Log("Collision detected");
 
         if(collision.gameObject.tag == "Player")
         {
-            Debug.Log("Collision with Player");
+            //Debug.Log("Collision with Player");
 
             playerController.GetHurt(transform.position);
 
@@ -54,8 +63,6 @@ public class BlockerScript : EnemyBase
             Debug.Log("Collision with shot");
             health -= collision.gameObject.GetComponent<ShotScript>().damage;
             animator.SetTrigger("IsHurt");
-
-            CheckHealth();
         }
     }
 
@@ -63,8 +70,20 @@ public class BlockerScript : EnemyBase
     {
         if (health <= 0)
         {
-            wS.DestroyEnemyValue(hash);
-            Destroy(gameObject);
+            if(timer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+            if(deathSet == false)
+            {
+                coll.enabled = false;
+                animator.SetBool("IsIdle", false);
+                animator.SetBool("IsDead", true);
+                deathSet = true;
+            }
+
+            timer += Time.deltaTime;
         }
     }
 }

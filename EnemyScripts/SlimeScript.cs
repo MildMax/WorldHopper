@@ -6,6 +6,7 @@ public class SlimeScript : EnemyBase
 {
     public int speed;
     public Vector2[] walkPoints;
+    public AnimationClip deathAnim;
 
     PlayerController playerController;
     Animator anim;
@@ -18,6 +19,9 @@ public class SlimeScript : EnemyBase
 
     int direction = 1;
     bool isDead = false;
+
+    float deathTime;
+    float timer = 0;
 
     //serialize/gui shite
     public delegate void WalkMethod();
@@ -51,6 +55,7 @@ public class SlimeScript : EnemyBase
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         groundLayer = "Ground" + (worldNum + 1);
         oldHealth = health;
+        deathTime = deathAnim.length * 3;
     }
 
     private void Update()
@@ -166,8 +171,20 @@ public class SlimeScript : EnemyBase
     {
         if(health <= 0)
         {
-            anim.SetBool("IsDead", true);
-            body.isKinematic = true;
+            if (isDead == false)
+            {
+                coll.enabled = false;
+                anim.SetBool("IsDead", true);
+                body.isKinematic = true;
+                walkType = NoWalk;
+                isDead = true;
+            }
+
+            if (timer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
             
             if(deathPos == false)
             {
@@ -175,8 +192,7 @@ public class SlimeScript : EnemyBase
                 deathPos = true;
             }
 
-            walkType = NoWalk;
-            StartCoroutine(KillWait());
+            timer += Time.deltaTime;
         }
         else if(oldHealth > health)
         {
@@ -184,13 +200,6 @@ public class SlimeScript : EnemyBase
         }
 
         oldHealth = health;
-    }
-
-    private IEnumerator KillWait()
-    {
-        yield return new WaitForSeconds(2.5f);
-        wS.DestroyEnemyValue(hash);
-        Destroy(gameObject);
     }
 
     //::::::::::::::AUTOWALK:::::::::::::::://
