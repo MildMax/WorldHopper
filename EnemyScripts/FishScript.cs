@@ -200,9 +200,5 @@ public class FishScript : EnemyBase
 
             //set damage here as well;
         }
-        else if(collision.gameObject.tag == "Player" && isDead == true)
-        {
-            Physics2D.IgnoreLayerCollision(gameObject.layer, collision.gameObject.layer);
-        }
     }
 }

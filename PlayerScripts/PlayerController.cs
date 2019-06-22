@@ -377,7 +377,9 @@ public class PlayerController : MonoBehaviour {
             {
                 doubleJump = true;
                 //body.velocity = new Vector2(body.velocity.x, doubleJumpVelocity);
+                //Debug.Log(body.velocity.y);
                 body.velocity = new Vector2(body.velocity.x, 0);
+                //Debug.Log(body.velocity.y);
                 body.AddForce(new Vector2(body.velocity.x, jumpVelocity));
             }
             else
