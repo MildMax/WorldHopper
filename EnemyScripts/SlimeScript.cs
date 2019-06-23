@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class SlimeScript : EnemyBase
 {
-    public int speed;
+    public float speed;
     public Vector2[] walkPoints;
     public AnimationClip deathAnim;
+    public float deathDrop = 0.1f;
 
     PlayerController playerController;
     Animator anim;
@@ -188,7 +189,7 @@ public class SlimeScript : EnemyBase
             
             if(deathPos == false)
             {
-                transform.position -= new Vector3(0f, 0.1f, 0f);
+                transform.position -= new Vector3(0f, deathDrop, 0f);
                 deathPos = true;
             }
 
