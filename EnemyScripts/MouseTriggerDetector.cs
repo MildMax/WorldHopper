@@ -7,6 +7,17 @@ public class MouseTriggerDetector : MonoBehaviour
     [HideInInspector]
     public bool inVicinity;
 
+    [HideInInspector]
+    public bool destroyThis = false;
+
+    private void Update()
+    {
+        if(destroyThis == true)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Player")

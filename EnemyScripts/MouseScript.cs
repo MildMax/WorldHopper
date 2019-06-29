@@ -13,6 +13,9 @@ public class MouseScript : EnemyBase
 
     SpriteRenderer rend;
     MouseTriggerDetector detector;
+    Animator anim;
+    CapsuleCollider2D coll;
+    WorldSwitcher wS;
 
     public float speed;
 
@@ -30,27 +33,45 @@ public class MouseScript : EnemyBase
 
     bool flipSprites = false;
 
+    public AnimationClip deathClip;
+    float deathWait;
+    float deathTimer = 0;
+    bool isDead = false;
+    bool deathSet = false;
+
+    float oldHealth;
+
     private void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
         detector = GetComponentInParent<MouseTriggerDetector>();
+        anim = GetComponent<Animator>();
+        coll = GetComponent<CapsuleCollider2D>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+        oldHealth = health;
+        deathWait = deathClip.length * 3;
         SetCondition();
     }
 
     private void Update()
     {
-        DetectLocation();
-        FlipSprites();
-
-        if (isMoving == false)
+        CheckHealth();
+        if (isDead == false)
         {
-            isMoving = condition();
+            DetectLocation();
+            FlipSprites();
+            ChangeAnimState();
+
+            if (isMoving == false)
+            {
+                isMoving = condition();
+            }
         }
     }
 
     private void FixedUpdate()
     {
-        if(isMoving == true)
+        if(isMoving == true && isDead == false)
         {
             MoveMouse();
             CheckArrival();
@@ -58,6 +79,33 @@ public class MouseScript : EnemyBase
     }
 
     //::::::::::::::::GENERIC:::::::::::::://
+
+    private void CheckHealth()
+    {
+        if(health <= 0)
+        {
+            if (deathSet == false)
+            {
+                isDead = true;
+                coll.enabled = false;
+                anim.SetBool("IsDead", true);
+            }
+            
+            if(deathTimer >= deathWait)
+            {
+                wS.DestroyEnemyValue(hash);
+                detector.destroyThis = true;
+                Destroy(gameObject);
+            }
+
+            deathTimer += Time.deltaTime;
+        }
+        else if(health < oldHealth)
+        {
+            anim.SetTrigger("IsHurt");
+            oldHealth = health;
+        }
+    }
 
     private void SetCondition()
     {
@@ -128,6 +176,29 @@ public class MouseScript : EnemyBase
                     rend.flipX = true;
                 }
             }
+        }
+    }
+
+    private void ChangeAnimState()
+    {
+        if (isDead == false)
+        {
+            if (isMoving == true)
+            {
+                anim.SetBool("IsWalking", true);
+            }
+            else
+            {
+                anim.SetBool("IsWalking", false);
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "Shot")
+        {
+            health -= collision.gameObject.GetComponent<ShotScript>().damage;
         }
     }
 
