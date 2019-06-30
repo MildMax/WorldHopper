@@ -79,6 +79,8 @@ public class PokerScript : EnemyBase
 
     private void Update()
     {
+        RetryGetWorldNum();
+
         CheckHealth();
         if (deathSet == false)
         {
@@ -152,6 +154,7 @@ public class PokerScript : EnemyBase
     private IEnumerator HurtTimer()
     {
         //isHurt = true;
+        Debug.Log("Running hurt coroutine");
         anim.runtimeAnimatorController = controllerHurt;
 
         yield return new WaitForSeconds(0.2f);
@@ -222,6 +225,14 @@ public class PokerScript : EnemyBase
         }
     }
 
+    private void RetryGetWorldNum()
+    {
+        if(worldNum == 10)
+        {
+            worldNum = GetWorldNum();
+        }
+    }
+
     private int GetWorldNum()
     {
         int num = 10;
@@ -250,6 +261,8 @@ public class PokerScript : EnemyBase
 
     private void DeactivateAnimator()
     {
+        //Debug.Log(wS.activeWorldNum + " : " + worldNum);
+
         if (wS.activeWorldNum != worldNum && deathSet == false)
         {
             anim.enabled = false;
