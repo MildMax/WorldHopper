@@ -95,7 +95,7 @@ public class InputManager : MonoBehaviour
 
     private void SetKeyboard()
     {
-        Debug.Log("KeyboardSet");
+        //Debug.Log("KeyboardSet");
 
         jump = "k_Jump";
         dash = "k_Dash";

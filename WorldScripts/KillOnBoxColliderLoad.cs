@@ -55,7 +55,7 @@ public class KillOnBoxColliderLoad : MonoBehaviour
                     Destroy(overlaps.gameObject);
                 }
 
-                Debug.Log("Set to destroy");
+                //Debug.Log("Set to destroy");
             }
         }
     }

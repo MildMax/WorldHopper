@@ -154,7 +154,7 @@ public class PokerScript : EnemyBase
     private IEnumerator HurtTimer()
     {
         //isHurt = true;
-        Debug.Log("Running hurt coroutine");
+        //Debug.Log("Running hurt coroutine");
         anim.runtimeAnimatorController = controllerHurt;
 
         yield return new WaitForSeconds(0.2f);
@@ -276,7 +276,7 @@ public class PokerScript : EnemyBase
     private void GetDeathStates()
     {
         Sprite c = rend.sprite;
-        Debug.Log(c.name);
+        //Debug.Log(c.name);
 
         string num = null;
 
@@ -291,7 +291,7 @@ public class PokerScript : EnemyBase
             }
         }
 
-        Debug.Log(num);
+        //Debug.Log(num);
 
         if (num != null)
         {
@@ -325,8 +325,8 @@ public class PokerScript : EnemyBase
             sadSprite = sadSprites[0]; 
         }
 
-        Debug.Log(whiteSprite.name);
-        Debug.Log(sadSprite.name);
+        //Debug.Log(whiteSprite.name);
+        //Debug.Log(sadSprite.name);
 
     }
 
