@@ -63,6 +63,12 @@ public class ShotScript : MonoBehaviour {
             val = true;
         }
 
+        //special case
+        if(coll.gameObject.tag == "WaterCollider")
+        {
+            val = false;
+        }
+
         return val;
     }
 }

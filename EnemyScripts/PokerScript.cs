@@ -131,20 +131,6 @@ public class PokerScript : EnemyBase
         StopAllCoroutines();
     }
 
-    //private void ChangeAnims()
-    //{
-    //    if(isHurt)
-    //    {
-    //        anim.runtimeAnimatorController = controllerSad;
-    //    }
-    //    else
-    //    {
-    //        anim.runtimeAnimatorController = controllerMad;
-    //    }
-    //}
-
-
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Shot")

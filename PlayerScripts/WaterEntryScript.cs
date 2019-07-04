@@ -13,19 +13,20 @@ public class WaterEntryScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Player" && gameObject.tag != "CollInactive")
+        if(collision.gameObject.tag == "Player")
         {
             playerController.inWater = true;
         }
+
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player" && gameObject.tag != "CollInactive")
+        if (collision.gameObject.tag == "Player")
         {
             playerController.inWater = true;
         }
-        if(collision.gameObject.tag == "Player" && gameObject.tag == "CollInactive")
+        if(collision.gameObject.tag == "Player")
         {
             playerController.inWater = false;
         }
@@ -33,7 +34,7 @@ public class WaterEntryScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player" && gameObject.tag != "CollInactive")
+        if (collision.gameObject.tag == "Player")
         {
             playerController.inWater = false;
         }
