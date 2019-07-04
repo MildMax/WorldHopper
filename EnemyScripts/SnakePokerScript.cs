@@ -84,14 +84,13 @@ public class SnakePokerScript : EnemyBase
 
     private void Update()
     {
+        RetryGetWorldNum();
+
         CheckHealth();
-        if (deathSet == false)
+
+        if(deathSet == false)
         {
-            DeactivateAnimator();
-        }
-        if (anim.enabled == true)
-        {
-            //ChangeAnims();
+            HandleCollider();
             ChangeAnimState();
             SetActionMethod();
             actionMethod();
@@ -253,6 +252,14 @@ public class SnakePokerScript : EnemyBase
         }
     }
 
+    private void RetryGetWorldNum()
+    {
+        if (worldNum == 10)
+        {
+            worldNum = GetWorldNum();
+        }
+    }
+
     private int GetWorldNum()
     {
         int num = 10;
@@ -279,15 +286,18 @@ public class SnakePokerScript : EnemyBase
 
     }
 
-    private void DeactivateAnimator()
+    private void HandleCollider()
     {
-        if (wS.activeWorldNum != worldNum && deathSet == false)
+        if (anim.GetBool("IsDown") == true || wS.activeWorldNum != worldNum)
         {
-            anim.enabled = false;
+            if (coll.enabled == true)
+            {
+                coll.enabled = false;
+            }
         }
-        else if (wS.activeWorldNum == worldNum && deathSet == false)
+        else if (coll.enabled == false)
         {
-            anim.enabled = true;
+            coll.enabled = true;
         }
     }
 

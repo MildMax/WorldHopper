@@ -125,6 +125,7 @@ public class BombScript : MonoBehaviour {
         Collider2D[] results = new Collider2D[10];
         ContactFilter2D cf = new ContactFilter2D();
         cf.SetLayerMask(LayerMask.GetMask("Enemy"));
+        cf.SetLayerMask(LayerMask.GetMask("EnemyB"));
         Physics2D.OverlapCircle(transform.position, 1f, cf, results);
 
         for(int i = 0; i != results.Length; ++i)

@@ -60,6 +60,8 @@ public class PokerScript : EnemyBase
     float dTimer = 0;
     bool deathSet = false;
 
+    bool newStart = false;
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -82,13 +84,10 @@ public class PokerScript : EnemyBase
         RetryGetWorldNum();
 
         CheckHealth();
+
         if (deathSet == false)
         {
-            DeactivateAnimator();
-        }
-        if (anim.enabled == true)
-        {
-            //ChangeAnims();
+            HandleCollider();
             SetActionMethod();
             actionMethod();
         }
@@ -125,7 +124,11 @@ public class PokerScript : EnemyBase
         start = false;
         startA = false;
         startD = false;
+        newStart = false;
         anim.SetBool("IsContinuous", false);
+        anim.SetBool("IsUp", false);
+        anim.SetBool("IsDown", true);
+        StopAllCoroutines();
     }
 
     //private void ChangeAnims()
@@ -259,17 +262,18 @@ public class PokerScript : EnemyBase
         
     }
 
-    private void DeactivateAnimator()
+    private void HandleCollider()
     {
-        //Debug.Log(wS.activeWorldNum + " : " + worldNum);
-
-        if (wS.activeWorldNum != worldNum && deathSet == false)
+        if(anim.GetBool("IsDown") == true || wS.activeWorldNum != worldNum)
         {
-            anim.enabled = false;
+            if (coll.enabled == true)
+            {
+                coll.enabled = false;
+            }
         }
-        else if(wS.activeWorldNum == worldNum && deathSet == false)
+        else if(coll.enabled == false)
         {
-            anim.enabled = true;
+            coll.enabled = true;
         }
     }
 
@@ -333,8 +337,13 @@ public class PokerScript : EnemyBase
     //::::::::::::CONTINOUS::::::::://
     private void Continuous()
     {
-        anim.SetBool("IsDown", false);
-        anim.SetBool("IsContinuous", true);
+        if (newStart == false)
+        {
+            anim.SetBool("IsDown", false);
+            anim.SetBool("IsContinuous", true);
+            newStart = true;
+        }
+
         if (!start)
         {
             StartCoroutine(ContinousAnimation());
@@ -358,7 +367,11 @@ public class PokerScript : EnemyBase
     //:::::::::::TIMED::::::::::::://
     private void Timed()
     {
-        anim.SetBool("IsDown", false);
+        if (newStart == false)
+        {
+            anim.SetBool("IsDown", false);
+            newStart = true;
+        }
         if(start == false)
         {
             StartCoroutine(TimedAnimation());
