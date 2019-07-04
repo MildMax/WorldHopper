@@ -13,6 +13,7 @@ public class WaterEntryScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Collision enter");
         if(collision.gameObject.tag == "Player")
         {
             playerController.inWater = true;
@@ -25,10 +26,6 @@ public class WaterEntryScript : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             playerController.inWater = true;
-        }
-        if(collision.gameObject.tag == "Player")
-        {
-            playerController.inWater = false;
         }
     }
 
