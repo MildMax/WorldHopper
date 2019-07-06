@@ -166,7 +166,10 @@ public class BombScript : MonoBehaviour {
         g4 = 1 << LayerMask.NameToLayer("Ground4");
         finalMask = g1 | g2 | g3 | g4;
 
-        //Debug.Log(finalMask);
+        //Debug.Log(g1);
+        //Debug.Log(g2);
+        //Debug.Log(g3);
+        //Debug.Log(g4);
     }
 
     private void FindCurrentLayerMask()

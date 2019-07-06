@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MouseTriggerDetector : MonoBehaviour
+public class BatTriggerDetector : MonoBehaviour
 {
     [HideInInspector]
     public bool inVicinity = false;
@@ -12,7 +12,7 @@ public class MouseTriggerDetector : MonoBehaviour
 
     private void Update()
     {
-        if(destroyThis == true)
+        if (destroyThis == true)
         {
             Destroy(gameObject);
         }
@@ -20,7 +20,7 @@ public class MouseTriggerDetector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if (collision.tag == "Player")
         {
             inVicinity = true;
         }
@@ -28,7 +28,7 @@ public class MouseTriggerDetector : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if (collision.tag == "Player")
         {
             inVicinity = true;
         }
@@ -36,7 +36,7 @@ public class MouseTriggerDetector : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if (collision.tag == "Player")
         {
             inVicinity = false;
         }
