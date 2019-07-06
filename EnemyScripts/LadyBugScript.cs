@@ -14,7 +14,6 @@ public class LadyBugScript : EnemyBase
     WalkMethod walkMethod;
 
     public int speed;
-    public float deathWait;
 
     int oldIndex = 4;
     public int direction = 1;
@@ -82,6 +81,18 @@ public class LadyBugScript : EnemyBase
     Vector2 snapPos;
     float snapRot;
 
+    //death stuff
+    public AnimationClip deathClip;
+    float dWait;
+    float dTimer = 0;
+    bool deathSet = false;
+
+    //fall stuff
+    RaycastHit2D fallDistance;
+    Vector2 vel;
+    Vector2 dest;
+    bool pointSet = false;
+
     private void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
@@ -95,10 +106,29 @@ public class LadyBugScript : EnemyBase
         SetMultipleLayers();
         startHealth = health;
         oldHealth = health;
+        dWait = deathClip.length * 3;
     }
 
     private void FixedUpdate()
     {
+        if (isDead == false && isFlying == false && returnToGround == false)
+        {
+            //anim.SetBool("IsNear", false);
+            walkMethod();
+        }
+        else if (isDead == false && isFlying == true)
+        {
+            TakeSnapshot();
+            Fly();
+        }
+        else if (isDead == false && returnToGround == true)
+        {
+            ReturnToGround();
+        }
+        else if (isDead == true && isFlying == true)
+        {
+            Fall();
+        }
     }
 
     // Update is called once per frame
@@ -109,24 +139,7 @@ public class LadyBugScript : EnemyBase
         FlipSprites();
         SetWalkMethod();
 
-        if (isDead == false && isFlying == false && returnToGround == false)
-        {
-            //anim.SetBool("IsNear", false);
-            walkMethod();
-        }
-        else if(isDead == false && isFlying == true)
-        {
-            TakeSnapshot();
-            Fly();
-        }
-        else if(isDead == false && returnToGround == true)
-        {
-            ReturnToGround();
-        }
-        else if (isDead == true)
-        {
-            //Fall if in air
-        }
+        
     }
 
     private void LateUpdate()
@@ -203,12 +216,28 @@ public class LadyBugScript : EnemyBase
     {
         if (health <= 0)
         {
+            if(deathSet == false)
+            {
+                fallDistance = Physics2D.Raycast(transform.position, -Vector2.up, 150, bL);
+                anim.SetBool("IsDead", true);
+                isDead = true;
+                rend.flipY = true;
+                coll.enabled = false;
+                deathSet = true;
+
+            }
             //wS.DestroyEnemyValue(hash);
-            isDead = true;
+            if(dTimer > dWait)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+
+            dTimer += Time.deltaTime;
         }
         else if(oldHealth > health)
         {
-            //set anim trigger
+            anim.SetTrigger("IsHurt");
 
             oldHealth = health;
         }
@@ -683,10 +712,12 @@ public class LadyBugScript : EnemyBase
             }
             else if (flyTimer > groundWait && flyTimer < flyWait)
             {
+                anim.SetBool("IsFlying", true);
                 isFlying = true;
             }
             else if (flyTimer >= flyWait)
             {
+                anim.SetBool("IsFlying", false);
                 returnToGround = true;
                 isFlying = false;
                 flyTimer = 0;
@@ -993,6 +1024,44 @@ public class LadyBugScript : EnemyBase
             snapPos = transform.position;
             snapRot = zRot;
             snapshotTaken = true;
+        }
+    }
+
+    private void Fall()
+    {
+        //Debug.Log("Fly falling");
+
+        if (fallDistance)
+        {
+            //Debug.Log("Falling w/ raycast");
+            if (pointSet == false)
+            {
+                dest = new Vector2(fallDistance.point.x, fallDistance.point.y + (coll.size.y / 2));
+                pointSet = true;
+            }
+
+            if (transform.position.y >= dest.y)
+            {
+                vel += 0.015f * Physics2D.gravity * Time.deltaTime;
+
+                Vector2 d = vel * Time.deltaTime;
+
+                Vector2 m = Vector2.up * vel;
+
+                transform.position = (Vector2)transform.position + m;
+            }
+
+        }
+        else
+        {
+            //Debug.Log("Falling w/out raycast");
+            vel += 0.015f * Physics2D.gravity * Time.deltaTime;
+
+            Vector2 d = vel * Time.deltaTime;
+
+            Vector2 m = Vector2.up * vel;
+
+            transform.position = (Vector2)transform.position + m;
         }
     }
 }
