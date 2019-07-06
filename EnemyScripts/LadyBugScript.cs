@@ -30,8 +30,8 @@ public class LadyBugScript : EnemyBase
     public Vector2[] autoWalkLimits;
 
     Point destination;
-    int zRot = 0;
-    public bool changeTraverse = false;
+    public int zRot;
+    bool changeTraverse = false;
 
     PlayerController playerController;
     Transform playerTransform;
@@ -47,9 +47,9 @@ public class LadyBugScript : EnemyBase
     public string wallLayer;
 
     //layers for masking
-    int gL;
-    int wL;
-    int bL;
+    int gL = 0;
+    int wL = 0;
+    int bL = 0;
 
     float oldHealth;
 
@@ -58,6 +58,8 @@ public class LadyBugScript : EnemyBase
     bool limitsFound = false;
     bool areaSet = false;
     bool flyTimerSet = false;
+    bool returnToGround = false;
+    bool snapshotTaken = false;
 
     public float groundTimeMin;
     public float groundTimeMax;
@@ -67,7 +69,6 @@ public class LadyBugScript : EnemyBase
     public float waitMax;
     public float xDistance;
     public float yDistance;
-    public int yDivisions;
     FlyLimits limits = new FlyLimits();
     Vector2 newPos;
     Vector2 originalPos;
@@ -77,6 +78,9 @@ public class LadyBugScript : EnemyBase
     float flyWait;
     float flyTimer = 0;
     float groundWait;
+
+    Vector2 snapPos;
+    float snapRot;
 
     private void Awake()
     {
@@ -105,14 +109,19 @@ public class LadyBugScript : EnemyBase
         FlipSprites();
         SetWalkMethod();
 
-        if (isDead == false && isFlying == false)
+        if (isDead == false && isFlying == false && returnToGround == false)
         {
             //anim.SetBool("IsNear", false);
             walkMethod();
         }
         else if(isDead == false && isFlying == true)
         {
+            TakeSnapshot();
             Fly();
+        }
+        else if(isDead == false && returnToGround == true)
+        {
+            ReturnToGround();
         }
         else if (isDead == true)
         {
@@ -122,7 +131,11 @@ public class LadyBugScript : EnemyBase
 
     private void LateUpdate()
     {
-        if (walkMethod == TraverseWalk)
+        if(isFlying == true || returnToGround == true)
+        {
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
+        else if (walkMethod == TraverseWalk)
         {
             transform.rotation = Quaternion.Euler(0f, 0f, zRot);
         }
@@ -219,9 +232,16 @@ public class LadyBugScript : EnemyBase
 
     private void SetMultipleLayers()
     {
+        //Debug.Log(groundLayer);
+        //Debug.Log(wallLayer);
+
         gL = 1 << LayerMask.NameToLayer(groundLayer);
         wL = 1 << LayerMask.NameToLayer(wallLayer);
         bL = gL | wL;
+
+        //Debug.Log("gL: " + gL);
+        //Debug.Log("wL: " + wL);
+        //Debug.Log("bL: " + bL);
     }
 
     //:::::::::::TRAVERSE:::::::::::::://
@@ -451,8 +471,8 @@ public class LadyBugScript : EnemyBase
         Quaternion rightDir = Quaternion.AngleAxis(zRot, Vector3.forward);
         dir = rightDir * dir;
 
-        Debug.DrawRay(coll.transform.position, dir);
-        Debug.DrawRay(coll.transform.position, upDir);
+        //Debug.DrawRay(coll.transform.position, dir);
+        //Debug.DrawRay(coll.transform.position, upDir);
 
         RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, dist + 0.1f, LayerMask.GetMask(groundLayer));
 
@@ -620,6 +640,21 @@ public class LadyBugScript : EnemyBase
         }
     }
 
+    private RaycastInfo DoRaycast(Vector2 dir, float dist, int layer)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, layer);
+        //Debug.Log(hit.)
+        if (hit)
+        {
+            RaycastInfo info = new RaycastInfo(hit.collider.transform.position, hit.point, hit.collider.bounds.size.x, hit.collider.bounds.size.y);
+            return info;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     //:::::::::::POINTWALK:::::::::::::://
 
     private void PointWalk()
@@ -632,30 +667,37 @@ public class LadyBugScript : EnemyBase
 
     private void FlyTimer()
     {
-        if(flyTimerSet == false)
+        if (returnToGround == false)
         {
-            
-            groundWait = Random.Range(groundTimeMin, groundTimeMax);
-            flyWait = Random.Range(flyTimeMin, flyTimeMax) + groundWait;
-            flyTimerSet = true;
-        }
+            if (flyTimerSet == false)
+            {
 
-        if(flyTimer <= groundWait)
-        {
-            isFlying = false;
-        }
-        if(flyTimer > groundWait && flyTimer < flyWait)
-        {
-            isFlying = true;
-        }
-        else if(flyTimer >= flyWait)
-        {
-            isFlying = false;
-            flyTimer = 0;
-            flyTimerSet = false;
-        }
+                groundWait = Random.Range(groundTimeMin, groundTimeMax);
+                flyWait = Random.Range(flyTimeMin, flyTimeMax) + groundWait;
+                flyTimerSet = true;
+            }
 
-        flyTimer += Time.deltaTime;
+            if (flyTimer <= groundWait)
+            {
+                isFlying = false;
+            }
+            else if (flyTimer > groundWait && flyTimer < flyWait)
+            {
+                isFlying = true;
+            }
+            else if (flyTimer >= flyWait)
+            {
+                returnToGround = true;
+                isFlying = false;
+                flyTimer = 0;
+                flyTimerSet = false;
+                limitsFound = false;
+                snapshotTaken = false;
+                areaSet = false;
+            }
+
+            flyTimer += Time.deltaTime;
+        }
     }
 
     private void Fly()
@@ -663,6 +705,7 @@ public class LadyBugScript : EnemyBase
         if (limitsFound == false)
         {
             limits = FindArea();
+            limits.Organize();
             Debug.Log("xMin: " + limits.xMin);
             Debug.Log("xMax: " + limits.xMax);
             Debug.Log("yMin: " + limits.yMin);
@@ -696,10 +739,22 @@ public class LadyBugScript : EnemyBase
     {
         originalPos = newPos;
 
-        newPos = new Vector2(
-            Random.Range(limits.xMin, limits.xMax),
-            Random.Range(limits.yMin, limits.yMax)
-            );
+        if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
+        {
+            newPos = new Vector2(
+                Random.Range(limits.xMin, limits.xMax),
+                Random.Range(limits.yMin, limits.yMax)
+                );
+        }
+        else if(Mathf.Abs(zRot) == 90 || Mathf.Abs(zRot) == 270)
+        {
+            newPos = new Vector2(
+                Random.Range(limits.yMin, limits.yMax),
+                Random.Range(limits.xMin, limits.xMax)
+                );
+        }
+
+        Debug.Log(newPos);
 
         waitTime = Random.Range(waitMin, waitMax);
         timer = 0;
@@ -726,8 +781,13 @@ public class LadyBugScript : EnemyBase
     private FlyLimits FindArea()
     {
         FlyLimits lim = new FlyLimits();
+        
+        Quaternion q = Quaternion.AngleAxis(zRot, Vector3.forward);
 
-        RaycastInfo r = DoRaycast(Vector2.right, xDistance);
+        RaycastInfo r = DoRaycast(q * Vector2.right, xDistance, bL);
+
+        Debug.DrawRay(transform.position, q * Vector2.right, Color.red);
+
         if(r != null)
         {
             if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
@@ -741,10 +801,21 @@ public class LadyBugScript : EnemyBase
         }
         else
         {
-            lim.xMax = xDistance;
+            if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
+            {
+                lim.xMax = transform.position.x + xDistance;
+            }
+            else if (Mathf.Abs(zRot) == 90 || Mathf.Abs(zRot) == 270)
+            {
+                lim.xMax = lim.xMax = transform.position.y + xDistance;
+            }
+            
         }
 
-        RaycastInfo l = DoRaycast(Vector2.left, xDistance);
+        RaycastInfo l = DoRaycast(q * Vector2.left, xDistance, bL);
+
+        Debug.DrawRay(transform.position, q * Vector2.left, Color.red);
+
         if (l != null)
         {
             if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
@@ -758,7 +829,15 @@ public class LadyBugScript : EnemyBase
         }
         else
         {
-            lim.xMin = xDistance;
+            if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
+            {
+                lim.xMin = transform.position.x - xDistance;
+            }
+            else if (Mathf.Abs(zRot) == 90 || Mathf.Abs(zRot) == 270)
+            {
+                lim.xMin = transform.position.y - xDistance;
+            }
+            
         }
 
         
@@ -766,7 +845,6 @@ public class LadyBugScript : EnemyBase
         if(zRot == 0)
         {
             lim.yMin = transform.position.y + (coll.size.y / 2);
-            lim.yMax = FindYLimits(lim.xMin, lim.xMax, transform.position);
         }
         else if(zRot == 180 || zRot == -180)
         {
@@ -781,10 +859,12 @@ public class LadyBugScript : EnemyBase
             lim.yMin = transform.position.x + (coll.size.y / 2);
         }
 
+        lim.yMax = FindYLimits(lim.xMin, lim.xMax, transform.position, q);
+
         return lim;
     }
 
-    private float FindYLimits(float min, float max, Vector2 pos)
+    private float FindYLimits(float min, float max, Vector2 pos, Quaternion q)
     {
         if(min > max)
         {
@@ -795,43 +875,94 @@ public class LadyBugScript : EnemyBase
 
         float height = yDistance;
 
-        float length = Mathf.Abs(max - min) / yDivisions;
+        float length = Mathf.Abs(max - min) / 0.7f;
+        Debug.Log("Length: " + length);
+
+        bool newHeightSet = false;
 
         if (Mathf.Abs(zRot) == 0 || Mathf.Abs(zRot) == 180)
         {
-            for(int i = 0; i != yDivisions + 1; ++i)
+            for(int i = 1; i != (int)length; ++i)
             {
-                Vector2 localPos = new Vector2((transform.position.x - min) + (i * length), transform.position.y);
+                Vector2 localPos = new Vector2((min) + (i * 0.7f), pos.y);
 
-                RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.up, yDistance, bL);
+                //Debug.Log("Drawing line " + i);
+                //Debug.DrawLine(localPos, new Vector2(localPos.x, localPos.y + yDistance), Color.red);
+                Debug.DrawRay(localPos, q * Vector2.up, Color.red);
+                //Debug.Log(q * Vector2.up);
+                RaycastHit2D hit = Physics2D.Raycast(localPos, q * Vector2.up, yDistance, bL);
 
                 if(hit)
                 {
-                    float yLim = Mathf.Abs(transform.position.y - hit.point.y);
+                    newHeightSet = true;
+
+                    //Debug.Log("Hit! - " + hit.point.y);
+                    float yLim = Mathf.Abs(pos.y - hit.point.y);
                     
                     if(yLim < height)
                     {
-                        height = yLim;
+                        if (Mathf.Abs(zRot) == 0)
+                        {
+                            height = pos.y + yLim;
+                        }
+                        else if(Mathf.Abs(zRot) == 180)
+                        {
+                            height = pos.y - yLim;
+                        }
                     }
+                }
+            }
+
+            if(newHeightSet == false)
+            {
+                if (Mathf.Abs(zRot) == 0)
+                {
+                    height = pos.y + yDistance;
+                }
+                else if (Mathf.Abs(zRot) == 180)
+                {
+                    height = pos.y - yDistance;
                 }
             }
         }
         else if (Mathf.Abs(zRot) == 90 || Mathf.Abs(zRot) == 270)
         {
-            for (int i = 0; i != yDivisions + 1; ++i)
+            for (int i = 1; i != (int)length; ++i)
             {
-                Vector2 localPos = new Vector2(transform.position.x, (transform.position.y - min) + (i * length));
+                Vector2 localPos = new Vector2(pos.x, (min) + (i * 0.7f));
 
-                RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.up, yDistance, bL);
+                //Debug.DrawLine(localPos, new Vector2(localPos.x + yDistance, localPos.y), Color.red);
+                Debug.DrawRay(localPos, q * Vector2.up, Color.red);
+                RaycastHit2D hit = Physics2D.Raycast(localPos, q * Vector2.up, yDistance, bL);
 
                 if (hit)
                 {
-                    float xLim = Mathf.Abs(transform.position.x - hit.point.x);
+                    Debug.Log("hit " + hit.collider.gameObject.name + " at point (" + hit.point.x + ", " + hit.point.y + ")");
+                    float xLim = Mathf.Abs(pos.x - hit.point.x);
 
                     if (xLim < height)
                     {
-                        height = xLim;
+                        if(zRot == 270 || zRot == -90)
+                        {
+                            height = pos.x + xLim;
+                        }
+                        else if(zRot == -270 || zRot == 90)
+                        {
+                            height = pos.x - xLim;
+                        }
                     }
+                }
+            }
+
+            if(newHeightSet == false)
+            {
+                if (zRot == 270 || zRot == -90)
+                {
+                    height = pos.x + yDistance;
+                }
+                else if (zRot == -270 || zRot == 90)
+                {
+                    height = pos.x - yDistance;
                 }
             }
         }
@@ -839,6 +970,30 @@ public class LadyBugScript : EnemyBase
         limitsFound = true;
 
         return height;
+    }
+
+    private void ReturnToGround()
+    {
+        if ((Vector2)transform.position != snapPos)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, snapPos, speed * Time.deltaTime);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(0f, 0f, snapRot);
+            returnToGround = false;
+        }
+    }
+
+    private void TakeSnapshot()
+    {
+        if (snapshotTaken == false)
+        {
+            Debug.Log("Snapshot taken");
+            snapPos = transform.position;
+            snapRot = zRot;
+            snapshotTaken = true;
+        }
     }
 }
 
@@ -848,4 +1003,21 @@ public class FlyLimits
     public float xMax = 0;
     public float yMax = 0;
     public float yMin = 0;
+
+    public void Organize()
+    {
+        if(xMin > xMax)
+        {
+            float temp = xMin;
+            xMin = xMax;
+            xMax = temp;
+        }
+
+        if(yMin > yMax)
+        {
+            float temp = yMin;
+            yMin = yMax;
+            yMax = temp;
+        }
+    }
 }
