@@ -15,10 +15,15 @@ public class BombScript : MonoBehaviour {
     WorldSwitcher worldSwitcher;
     GameObject player;
 
-    int hitTimer = 0;
+    public float waitTime;
+    public float durationWait = 3;
+
+    float hitTimer = 0;
     float durationTimer = 0;
     bool bodyFrozen = false;
     int worldNum;
+    int oldWorldNum;
+    bool initialSet = false;
 
     //contact filter stuff
     int g1;
@@ -26,6 +31,7 @@ public class BombScript : MonoBehaviour {
     int g3;
     int g4;
     int finalMask;
+    int currMask;
 
     private void Awake()
     {
@@ -37,7 +43,9 @@ public class BombScript : MonoBehaviour {
         playerBody = player.GetComponent<Rigidbody2D>();
         worldSwitcher = player.GetComponentInChildren<WorldSwitcher>();
         worldNum = worldSwitcher.activeWorldNum;
+        oldWorldNum = worldNum;
         SetLayerMasks();
+        FindCurrentLayerMask();
         //Debug.Log(playerBody.velocity.x + " " + playerBody.velocity.y);
 
         if (playerController.direction > 0)
@@ -58,8 +66,10 @@ public class BombScript : MonoBehaviour {
     private void Update()
     {
 
+        FindCurrentLayerMask();
+
         RaycastHit2D hit = Physics2D.Raycast(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - (boxCollider.size.y / 2), boxCollider.transform.position.z),
-            Vector2.down, 0.075f, finalMask);
+            Vector2.down, 0.075f, currMask);
 
         //Debug.DrawRay(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - (boxCollider.size.y / 2), boxCollider.transform.position.z), Vector2.down);
 
@@ -71,10 +81,10 @@ public class BombScript : MonoBehaviour {
         }
         else
         {
-            hitTimer += 1;
+            hitTimer += Time.deltaTime;
         }
 
-        if (hitTimer >= 35 && bodyFrozen == false)
+        if (hitTimer >= waitTime && bodyFrozen == false)
         {
             body.constraints = RigidbodyConstraints2D.FreezeAll;
             bodyFrozen = true;
@@ -91,7 +101,7 @@ public class BombScript : MonoBehaviour {
         }
         durationTimer += Time.deltaTime;
 
-        if(durationTimer >= 3)
+        if(durationTimer >= durationWait)
         {
             ExplosionDamage();
             Destroy(gameObject);
@@ -157,5 +167,33 @@ public class BombScript : MonoBehaviour {
         finalMask = g1 | g2 | g3 | g4;
 
         //Debug.Log(finalMask);
+    }
+
+    private void FindCurrentLayerMask()
+    {
+        if (oldWorldNum != worldSwitcher.activeWorldNum || initialSet == false)
+        {
+            initialSet = true;
+
+            switch (worldSwitcher.activeWorldNum)
+            {
+                case 0:
+                    currMask = g1;
+                    break;
+                case 1:
+                    currMask = g2;
+                    break;
+                case 2:
+                    currMask = g3;
+                    break;
+                case 3:
+                    currMask = g4;
+                    break;
+                default:
+                    currMask = finalMask;
+                    break;
+            }
+            oldWorldNum = worldSwitcher.activeWorldNum;
+        }
     }
 }
