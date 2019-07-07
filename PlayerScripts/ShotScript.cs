@@ -68,6 +68,10 @@ public class ShotScript : MonoBehaviour {
         {
             val = false;
         }
+        else if(coll.gameObject.tag == "Ghost")
+        {
+            val = false;
+        }
 
         return val;
     }

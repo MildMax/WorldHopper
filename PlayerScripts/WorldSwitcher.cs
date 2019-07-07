@@ -86,7 +86,10 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if(worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                 {
-                    enemyRend.Add(worldRenderers[i][j]);
+                    if (worldRenderers[i][j].gameObject.tag != "Ghost")
+                    {
+                        enemyRend.Add(worldRenderers[i][j]);
+                    }
                     worldRenderers[i][j] = null;
                 }
             }
@@ -102,9 +105,12 @@ public class WorldSwitcher : MonoBehaviour {
                 //Debug.Log("Layermask.GetMask(\"Enemy\"): " + (1 << 9) + "-- worldColliders[i][j].gameObject.layer: " + worldColliders[i][j].gameObject.layer);
                 if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                 {
-                    string t = "W" + (i + 1) + "-" + j;
-                    enemyColliders[i].Add(t, worldColliders[i][j]);
-                    worldColliders[i][j].gameObject.GetComponent<EnemyBase>().hash = t;
+                    if (worldColliders[i][j].gameObject.tag != "Ghost")
+                    {
+                        string t = "W" + (i + 1) + "-" + j;
+                        enemyColliders[i].Add(t, worldColliders[i][j]);
+                        worldColliders[i][j].gameObject.GetComponent<EnemyBase>().hash = t;
+                    }
                     worldColliders[i][j] = null;
                 }
                 else if(worldColliders[i][j].tag == "WaterCollider")
