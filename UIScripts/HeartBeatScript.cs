@@ -53,8 +53,8 @@ public class HeartBeatScript : MonoBehaviour
         float x = startPosition.x - ((heart.rectTransform.sizeDelta.x - heartSize.x) / 2);
         float y = startPosition.y - ((heart.rectTransform.sizeDelta.x - heartSize.y) / 2);
 
-        Debug.Log("X: " + (heart.rectTransform.sizeDelta.x - heartSize.x));
-        Debug.Log("Y: " + (heart.rectTransform.sizeDelta.x - heartSize.y));
+        //Debug.Log("X: " + (heart.rectTransform.sizeDelta.x - heartSize.x));
+        //Debug.Log("Y: " + (heart.rectTransform.sizeDelta.x - heartSize.y));
 
         rect.localPosition = new Vector2(x, y);
     }
