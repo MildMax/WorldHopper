@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    //pull and interact with HealthHUDScript
+    //FOR TIME BEING -- CANNOT BE GREATER THAN 6
+    public int health = 6;
+
+    public float invulTime;
+    float invulTimer = 0;
+    bool isInvul = false;
+
     //used for debugging purposes
     //set in Update() method
     //public Vector2 bodyVelocity;
@@ -153,14 +161,26 @@ public class PlayerController : MonoBehaviour {
     Vector3 halfCollSizeX;
     Vector3 halfCollSizeY;
 
+    SpriteRenderer rend;
+    Color white = Color.white;
+    Color fade = new Color(1, 1, 1, 0.75f);
+
+    float deathTime;
+    float deathSwitch;
+    float deathTimer = 0;
+    float switchTimer = 0;
+    bool deathSet = false;
+    [HideInInspector]
+    public bool isDead = false;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
-        boxCollider = GetComponent<BoxCollider2D>();
         //itemSwitcher = GetComponentInChildren<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
         playerAnimScript = GetComponent<PlayerAnimationScript>();
+        rend = GetComponent<SpriteRenderer>();
         previousDirection = transform.position.x;
         direction = awakeDirection;
         IM = GetComponent<InputManager>();
@@ -168,6 +188,8 @@ public class PlayerController : MonoBehaviour {
         halfCollSizeX = new Vector3((boxCollider.size.x / 2) - (boxCollider.size.x / 10), 0f, 0f);
         halfCollSizeY = new Vector3(0f, boxCollider.size.y / 2, 0f);
         offset = transform.position.x - previousDirection;
+        deathTime = 2;
+        deathSwitch = deathTime / 6; 
     }
 
     //private void FixedUpdate()
@@ -239,6 +261,41 @@ public class PlayerController : MonoBehaviour {
         CheckDistanceToGround();
         CheckFreeFall();
 
+    }
+
+    public void CheckHealth()
+    {
+        if(health > 6)
+        {
+            health = 6;
+        }
+        else if(health <= 0)
+        {
+            if(deathSet == false)
+            {
+                isDead = true;
+                boxCollider.enabled = false;
+                rend.color = white;
+                rend.enabled = false;
+                body.constraints = RigidbodyConstraints2D.FreezeAll;
+                deathSet = true;
+            }
+
+            if(switchTimer >= deathSwitch)
+            {
+                rend.enabled = !rend.enabled;
+                switchTimer = 0;
+            }
+
+            if(deathTimer >= deathTime)
+            {
+                Destroy(gameObject);
+            }
+
+            switchTimer += Time.deltaTime;
+            deathTimer += Time.deltaTime;
+            //destroy game object
+        }
     }
 
     private IEnumerator CheckHurtHeight(float x, float y)
@@ -674,12 +731,33 @@ public class PlayerController : MonoBehaviour {
 
     public void GetHurt(Vector2 pos)
     {
-        isHurt = true;
-        playerAnimScript.hurt = true;
-
-        if (transform.position.y < pos.y)
+        if (!isInvul)
         {
-            belowEnemy = true;
+            isHurt = true;
+            playerAnimScript.hurt = true;
+            isInvul = true;
+            health -= 1;
+            rend.color = fade;
+
+            if (transform.position.y < pos.y)
+            {
+                belowEnemy = true;
+            }
+        }
+    }
+
+    public void InvulnerableOnHurt()
+    {
+        if(isInvul)
+        {
+            invulTimer += Time.deltaTime;
+
+            if(invulTimer >= invulTime)
+            {
+                rend.color = white;
+                isInvul = false;
+                invulTimer = 0;
+            }
         }
     }
 

@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class HealthHUDScript : MonoBehaviour
 {
-    //set health to pull from player(0 - 6)
-    public int health;
 
     public Sprite heartEmpty;
     public Sprite heartHalf;
@@ -14,12 +12,14 @@ public class HealthHUDScript : MonoBehaviour
 
     Image[] hearts;
     Vector2 startPos;
+    PlayerController playerController;
 
     int oldHealth = 100;
 
     private void Awake()
     {
         hearts = GetComponentsInChildren<Image>();
+        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         //Debug.Log(hearts.Length);
         SetHearts();
     }
@@ -31,12 +31,12 @@ public class HealthHUDScript : MonoBehaviour
 
     private void SetHearts()
     {
-        if(oldHealth != health)
+        if (oldHealth != playerController.health)
         {
-            SetEmptyHearts(health);
-            SetFullHearts(health);
+            SetEmptyHearts(playerController.health);
+            SetFullHearts(playerController.health);
 
-            switch(health)
+            switch(playerController.health)
             {
                 case 1:
                     hearts[0].sprite = heartHalf;
@@ -50,7 +50,7 @@ public class HealthHUDScript : MonoBehaviour
 
             }
 
-            oldHealth = health;
+            oldHealth = playerController.health;
         }
     }
 

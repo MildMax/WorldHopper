@@ -37,33 +37,44 @@ public class PlayerExecutor : MonoBehaviour
 
     private void FixedUpdate()
     {
-        WorldSwitcherFU();
-        PlayerControllerFU();
-        ShootFU();
-        ThrowBombFU();
-        //ItemSwitcherFU();
+        if (playerController.isDead == false)
+        {
+            WorldSwitcherFU();
+            PlayerControllerFU();
+            ShootFU();
+            ThrowBombFU();
+            //ItemSwitcherFU();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        PlayerControllerU();
-        PlayerAnimationScriptU();
-        PlayerLightScriptU();
+        playerController.CheckHealth();
 
-        //ItemSwitcherU();
-        ItemSwitcherAltU();
-        WorldSwitcherU();
+        if (playerController.isDead == false)
+        {
+            PlayerControllerU();
+            PlayerAnimationScriptU();
+            PlayerLightScriptU();
 
-        ShootU();
-        ThrowBombU();
+            //ItemSwitcherU();
+            ItemSwitcherAltU();
+            WorldSwitcherU();
 
-        ShieldScriptU();
+            ShootU();
+            ThrowBombU();
+
+            ShieldScriptU();
+        }
     }
 
     private void LateUpdate()
     {
-        PlayerControllerLU();
+        if (playerController.isDead == false)
+        {
+            PlayerControllerLU();
+        }
         
     }
 
@@ -77,6 +88,8 @@ public class PlayerExecutor : MonoBehaviour
     private void PlayerControllerU()
     {
         //playerController.vel = playerController.body.velocity;
+        playerController.InvulnerableOnHurt();
+
         playerController.CheckKeyInput();
         if (playerAnimationScript.hurt == false)
         {
