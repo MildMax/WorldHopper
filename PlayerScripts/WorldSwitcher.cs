@@ -66,11 +66,23 @@ public class WorldSwitcher : MonoBehaviour {
         {
             worlds.Add(child.gameObject);
         }
+
+        if(worlds.Count != 4)
+        {
+            for(int i = worlds.Count; i != 4; ++i)
+            {
+                worlds.Add(null);
+            }
+        }
         
         for(int i = 0; i != worlds.Count; ++i)
         {
-            worldRenderers[i] = worlds[i].GetComponentsInChildren<SpriteRenderer>();
-            worldColliders[i] = worlds[i].GetComponentsInChildren<Collider2D>();
+
+            if (worlds[i] != null)
+            {
+                worldRenderers[i] = worlds[i].GetComponentsInChildren<SpriteRenderer>();
+                worldColliders[i] = worlds[i].GetComponentsInChildren<Collider2D>();
+            }
 
             //Debug.Log(worlds[i].name);
         }
@@ -82,45 +94,51 @@ public class WorldSwitcher : MonoBehaviour {
         {
             List<SpriteRenderer> enemyRend = new List<SpriteRenderer>();
 
-            for (int j = 0; j != worldRenderers[i].Length; ++j)
+            if (worldRenderers[i] != null)
             {
-                if(worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
+                for (int j = 0; j != worldRenderers[i].Length; ++j)
                 {
-                    if (worldRenderers[i][j].gameObject.tag != "Ghost")
+                    if (worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldRenderers[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                     {
-                        enemyRend.Add(worldRenderers[i][j]);
+                        if (worldRenderers[i][j].gameObject.tag != "Ghost")
+                        {
+                            enemyRend.Add(worldRenderers[i][j]);
+                        }
+                        worldRenderers[i][j] = null;
                     }
-                    worldRenderers[i][j] = null;
                 }
-            }
 
-            enemyRenderers[i] = ConvertList(enemyRend);
-            worldRenderers[i] = ResizeArray(worldRenderers[i]);
+                enemyRenderers[i] = ConvertList(enemyRend);
+                worldRenderers[i] = ResizeArray(worldRenderers[i]);
+            }
         }
 
         for (int i = 0; i != worldColliders.Length; ++i)
         {
-            for (int j = 0; j != worldColliders[i].Length; ++j)
+            if (worldColliders[i] != null)
             {
-                //Debug.Log("Layermask.GetMask(\"Enemy\"): " + (1 << 9) + "-- worldColliders[i][j].gameObject.layer: " + worldColliders[i][j].gameObject.layer);
-                if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
+                for (int j = 0; j != worldColliders[i].Length; ++j)
                 {
-                    if (worldColliders[i][j].gameObject.tag != "Ghost")
+                    //Debug.Log("Layermask.GetMask(\"Enemy\"): " + (1 << 9) + "-- worldColliders[i][j].gameObject.layer: " + worldColliders[i][j].gameObject.layer);
+                    if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Enemy") || worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("EnemyB"))
                     {
-                        string t = "W" + (i + 1) + "-" + j;
-                        enemyColliders[i].Add(t, worldColliders[i][j]);
-                        worldColliders[i][j].gameObject.GetComponent<EnemyBase>().hash = t;
+                        if (worldColliders[i][j].gameObject.tag != "Ghost")
+                        {
+                            string t = "W" + (i + 1) + "-" + j;
+                            enemyColliders[i].Add(t, worldColliders[i][j]);
+                            worldColliders[i][j].gameObject.GetComponent<EnemyBase>().hash = t;
+                        }
+                        worldColliders[i][j] = null;
                     }
-                    worldColliders[i][j] = null;
+                    else if (worldColliders[i][j].tag == "WaterCollider")
+                    {
+                        worldColliders[i][j] = null;
+                    }
                 }
-                else if(worldColliders[i][j].tag == "WaterCollider")
-                {
-                    worldColliders[i][j] = null;
-                }
-            }
 
-            //Debug.Log(enemyColliders[i].Count);
-            worldColliders[i] = ResizeArray(worldColliders[i]);
+                //Debug.Log(enemyColliders[i].Count);
+                worldColliders[i] = ResizeArray(worldColliders[i]);
+            }
         }
 
         //Debug.Log("worldColliders[0] length after removal: " + worldColliders[0].Length);
@@ -316,15 +334,18 @@ public class WorldSwitcher : MonoBehaviour {
         for(int i = 0; i != buttonsPressed.Length; ++i)
         {
             //Debug.Log(worlds.Count);
-            if(!buttonsPressed[i] && worlds[i] != activeWorld && worlds[i] != null)
+            if(worlds[i] != null)
             {
-                for (int j = 0; j != worldRenderers[i].Length; ++j)
+                if (!buttonsPressed[i] && worlds[i] != activeWorld)
                 {
-                    if (worldRenderers[i][j] != null)
+                    for (int j = 0; j != worldRenderers[i].Length; ++j)
                     {
-                        worldRenderers[i][j].sortingOrder = 0;
-                        worldRenderers[i][j].color = solid;
-                        worldRenderers[i][j].enabled = false;
+                        if (worldRenderers[i][j] != null)
+                        {
+                            worldRenderers[i][j].sortingOrder = 0;
+                            worldRenderers[i][j].color = solid;
+                            worldRenderers[i][j].enabled = false;
+                        }
                     }
                 }
             }
