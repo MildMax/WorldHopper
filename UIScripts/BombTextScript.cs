@@ -5,19 +5,20 @@ using UnityEngine.UI;
 
 public class BombTextScript : MonoBehaviour
 {
-    //track this in bombscript
-    public int bombCount;
+
+    BombCounterScript counterScript;
 
     Text bombText;
 
     private void Awake()
     {
+        counterScript = GameObject.FindGameObjectWithTag("BombCanvas").GetComponentInChildren<BombCounterScript>();
         bombText = GetComponent<Text>();
-        bombText.text = "x" + bombCount;
+        bombText.text = "x" + counterScript.bombCount;
     }
 
     private void Update()
     {
-        bombText.text = "x" + bombCount;
+        bombText.text = "x" + counterScript.bombCount;
     }
 }

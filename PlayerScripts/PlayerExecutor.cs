@@ -56,7 +56,7 @@ public class PlayerExecutor : MonoBehaviour
         {
             PlayerControllerU();
             PlayerAnimationScriptU();
-            PlayerLightScriptU();
+            //PlayerLightScriptU();
 
             //ItemSwitcherU();
             ItemSwitcherAltU();
