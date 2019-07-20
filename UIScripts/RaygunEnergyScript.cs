@@ -13,11 +13,13 @@ public class RaygunEnergyScript : MonoBehaviour
     public Color bgNormal;
     public Color bgLow;
 
-    Slider slider;
+    [HideInInspector]
+    public Slider slider;
     Image[] bars;
 
     //use this value to prevent player from shooting
-    bool cantShoot = false;
+    [HideInInspector]
+    public bool cantShoot = false;
 
     private void Awake()
     {
