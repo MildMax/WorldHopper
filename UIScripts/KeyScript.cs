@@ -80,15 +80,19 @@ public class KeyScript : MonoBehaviour
                 {
                     case "red":
                         keyImages[i].sprite = redKeyEmpty;
+                        SetOutline(keyImages[i].gameObject);
                         break;
                     case "blue":
                         keyImages[i].sprite = blueKeyEmpty;
+                        SetOutline(keyImages[i].gameObject);
                         break;
                     case "green":
                         keyImages[i].sprite = greenKeyEmpty;
+                        SetOutline(keyImages[i].gameObject);
                         break;
                     case "yellow":
                         keyImages[i].sprite = yellowKeyEmpty;
+                        SetOutline(keyImages[i].gameObject);
                         break;
                     default:
                         keyImages[i].sprite = keyEmpty;
@@ -129,5 +133,11 @@ public class KeyScript : MonoBehaviour
 
             hasNewKey = false;
         }
+    }
+
+    private void SetOutline(GameObject g)
+    {
+        Outline o = g.GetComponent<Outline>();
+        o.enabled = true;
     }
 }

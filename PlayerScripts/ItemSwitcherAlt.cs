@@ -76,7 +76,7 @@ public class ItemSwitcherAlt : MonoBehaviour
         if (Input.GetButtonDown(IM.swap))
         {
             ++itemIndex;
-            if (itemIndex == 6)
+            if (itemIndex == 5)
             {
                 itemIndex = 0;
             }
@@ -167,12 +167,12 @@ public class ItemSwitcherAlt : MonoBehaviour
                     SetNewSprite(current);
                     return;
                 //torch
-                case 5:
-                    renderers[9].enabled = true;
-                    current = renderers[9];
-                    SetNewSprite(current);
-                    return;
-                //umbrella
+                //case 5:
+                //    renderers[9].enabled = true;
+                //    current = renderers[9];
+                //    SetNewSprite(current);
+                //    return;
+                ////umbrella
                 
             }
 
