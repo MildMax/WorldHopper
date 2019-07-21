@@ -379,9 +379,12 @@ public class PlayerController : MonoBehaviour {
                 ground = right;
             }
 
-            grounded = true;
-            doubleJump = false;
-            airDash = false;
+            if (transform.position.y >= ground.collider.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2))
+            {
+                grounded = true;
+                doubleJump = false;
+                airDash = false;
+            }
         }
         else
         {
@@ -610,7 +613,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (grounded && hasJumped == false && playerAnimScript.hurt == false)
         {
-            transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2));
+            //transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2));
         }
     }
 

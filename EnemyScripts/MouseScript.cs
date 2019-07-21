@@ -95,6 +95,7 @@ public class MouseScript : EnemyBase
             if(deathTimer >= deathWait)
             {
                 wS.DestroyEnemyValue(hash);
+                wS.DestroyEnemyValue(detector.hash);
                 detector.destroyThis = true;
                 Destroy(gameObject);
             }
@@ -182,13 +183,15 @@ public class MouseScript : EnemyBase
 
     private void HideRenderer()
     {
-        if(((Vector2)transform.position == pos1 || (Vector2)transform.position == pos2) && detector.inVicinity == false)
+        if((Vector2)transform.position == pos1 || (Vector2)transform.position == pos2)
         {
             rend.enabled = false;
+            coll.enabled = false;
         }
         else
         {
             rend.enabled = true;
+            coll.enabled = true;
         }
     }
 
