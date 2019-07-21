@@ -127,7 +127,8 @@ public class PlayerController : MonoBehaviour {
 
     //used in CheckIfGrounded() function for position and height of raycast
     //used in CheckDistanceToGround() function for "" "" "" "" ""
-    BoxCollider2D boxCollider;
+    [HideInInspector]
+    public BoxCollider2D boxCollider;
 
     //taken from child object Items
     //used in DeployUmbrella()
@@ -736,6 +737,9 @@ public class PlayerController : MonoBehaviour {
             isHurt = true;
             playerAnimScript.hurt = true;
             isInvul = true;
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), true);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("EnemyB"), true);
+
             health -= 1;
             rend.color = fade;
 
@@ -757,6 +761,8 @@ public class PlayerController : MonoBehaviour {
                 rend.color = white;
                 isInvul = false;
                 invulTimer = 0;
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("EnemyB"), false);
             }
         }
     }

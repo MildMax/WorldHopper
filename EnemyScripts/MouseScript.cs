@@ -61,6 +61,7 @@ public class MouseScript : EnemyBase
             DetectLocation();
             FlipSprites();
             ChangeAnimState();
+            HideRenderer();
 
             if (isMoving == false)
             {
@@ -179,6 +180,18 @@ public class MouseScript : EnemyBase
         }
     }
 
+    private void HideRenderer()
+    {
+        if(((Vector2)transform.position == pos1 || (Vector2)transform.position == pos2) && detector.inVicinity == false)
+        {
+            rend.enabled = false;
+        }
+        else
+        {
+            rend.enabled = true;
+        }
+    }
+
     private void ChangeAnimState()
     {
         if (isDead == false)
@@ -199,6 +212,14 @@ public class MouseScript : EnemyBase
         if(collision.tag == "Shot")
         {
             health -= collision.gameObject.GetComponent<ShotScript>().damage;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Player")
+        {
+            collision.gameObject.GetComponent<PlayerController>().GetHurt(coll.transform.position);
         }
     }
 

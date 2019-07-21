@@ -26,7 +26,7 @@ public class KillOnBoxColliderLoad : MonoBehaviour
         {
             if (colliderEnabled == false && colliders[i].isActiveAndEnabled == true)
             {
-                colliderEnabled = true;
+                colliderEnabled = true; 
             }
         }
     }

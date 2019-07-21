@@ -14,25 +14,56 @@ public class KillOnLoad : MonoBehaviour {
     //      to reduce the number of objects that are being called each time the world switches, or just find a less costly
     //      method of checking the players position in relation to the world. Depends on the tests. Lag bad. No want lag.
 
+    bool isEnabled;
+
+    int layer;
+
     Transform[] worldBoxPos;
-    Vector2 size = new Vector2(0.7f, 0.7f);
+    Transform pos;
+    Vector2 size;
+    Collider2D coll;
 
     private void Awake()
     {
-        worldBoxPos = GetComponentsInChildren<Transform>();
+        coll = GetComponent<Collider2D>();
+        size = (Vector2)coll.bounds.size;
+        pos = coll.transform;
     }
 
-    private void OnEnable()
+    private void FixedUpdate()
     {
+        DestroyOnColliderEnabled();
+        CheckEnabled();
+    }
 
-        foreach (Transform i in worldBoxPos)
-        {
-            Collider2D overlaps = Physics2D.OverlapBox(i.position, size, 0f, LayerMask.GetMask("Default"));
+    private void DestroyOnColliderEnabled()
+    {
+        if(coll.isTrigger == false && isEnabled == false)
+        {     
+            Collider2D overlaps = Physics2D.OverlapBox(pos.position, size, 0f, LayerMask.GetMask("Player"));
+
+            //Debug.Log(overlaps == null);
+            //Debug.Log(overlaps.name);
 
             if (overlaps != null && overlaps.name == "Player")
             {
-                Destroy(overlaps.gameObject);
+                PlayerController p = overlaps.gameObject.GetComponent<PlayerController>();
+                p.boxCollider.enabled = false;
+                p.health = 0;
             }
+            
+        }
+    }
+
+    private void CheckEnabled()
+    {
+        if(isEnabled == false && coll.isTrigger == false)
+        {
+            isEnabled = true;
+        }
+        else if(isEnabled == true && coll.isTrigger == true)
+        {
+            isEnabled = false;
         }
     }
 

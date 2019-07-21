@@ -25,7 +25,7 @@ public class RaygunEnergyScript : MonoBehaviour
     {
         slider = GetComponent<Slider>();
         bars = GetComponentsInChildren<Image>();
-        Debug.Log(bars.Length);
+        //Debug.Log(bars.Length);
     }
 
     private void Update()

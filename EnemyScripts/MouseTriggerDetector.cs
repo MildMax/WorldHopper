@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MouseTriggerDetector : MonoBehaviour
+public class MouseTriggerDetector : EnemyBase
 {
     [HideInInspector]
     public bool inVicinity = false;
