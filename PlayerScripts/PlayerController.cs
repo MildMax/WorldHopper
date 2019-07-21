@@ -379,7 +379,7 @@ public class PlayerController : MonoBehaviour {
                 ground = right;
             }
 
-            if (transform.position.y >= ground.collider.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2))
+            if(body.velocity.y <= 0)
             {
                 grounded = true;
                 doubleJump = false;
