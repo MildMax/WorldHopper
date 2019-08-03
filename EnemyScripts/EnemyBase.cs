@@ -43,7 +43,7 @@ public class EnemyBase : MonoBehaviour
         }
         else
         {
-            Debug.Log("Cannot detect layer based on hash for " + gameObject.name + " -- returned null");
+            //Debug.Log("Cannot detect layer based on hash for " + gameObject.name + " -- returned null");
             return null;
         }
     }

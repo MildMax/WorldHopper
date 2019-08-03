@@ -38,7 +38,12 @@ public class WorldSwitcher : MonoBehaviour {
     //for reseting colliders after destroy enemy and world switch
     [HideInInspector]
     public bool enemyDestroyed = false;
- 
+
+    //for resetting preview buttons
+    bool p1 = false;
+    bool p2 = false;
+    bool p3 = false;
+    bool p4 = false;
 
     //public float x;
     //public float y;
@@ -49,7 +54,7 @@ public class WorldSwitcher : MonoBehaviour {
         RemoveBGRenderer();
         SetLevel();
         SetActiveWorld(activeWorldNum);
-        SetInitialBG();
+        //SetInitialBG();
         IM = GetComponentInParent<InputManager>();
     }
 
@@ -263,14 +268,14 @@ public class WorldSwitcher : MonoBehaviour {
     {
         for (int i = 0; i != next.Length; ++i)
         {
-            next[i].sortingOrder = -1;
+            //next[i].sortingOrder = -1;
             next[i].enabled = true;
         }
 
         for (int i = 0; i != prev.Length; ++i)
         {
             prev[i].enabled = false;
-            prev[i].sortingOrder = -2;
+            //prev[i].sortingOrder = -2;
         }
     }
 
@@ -284,12 +289,16 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if (worldRenderers[0][i] != null)
                 {
-                    worldRenderers[0][i].sortingOrder = 1;
-                    worldRenderers[0][i].enabled = true;
-                    worldRenderers[0][i].color = opaque;
+                    if (p1 == false)
+                    {
+                        worldRenderers[0][i].sortingOrder += 1;
+                        worldRenderers[0][i].enabled = true;
+                        worldRenderers[0][i].color = opaque;
+                    }
                     buttonsPressed[0] = true;
                 }
             }
+            if(p1 == false) p1 = true;
         }
         else if (Input.GetAxisRaw(IM.previewX) > 0 && worldRenderers[2] != null && activeWorld != worlds[2])
         {
@@ -297,12 +306,16 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if (worldRenderers[2][i] != null)
                 {
-                    worldRenderers[2][i].sortingOrder = 1;
-                    worldRenderers[2][i].enabled = true;
-                    worldRenderers[2][i].color = opaque;
+                    if (p3 == false)
+                    {
+                        worldRenderers[2][i].sortingOrder += 1;
+                        worldRenderers[2][i].enabled = true;
+                        worldRenderers[2][i].color = opaque;
+                    }
                     buttonsPressed[2] = true;
                 }
             }
+            if(p3 == false) p3 = true;
         }
         else if (Input.GetAxisRaw(IM.previewY) > 0 && worldRenderers[1] != null && activeWorld != worlds[1])
         {
@@ -310,12 +323,18 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if (worldRenderers[1][i] != null)
                 {
-                    worldRenderers[1][i].sortingOrder = 1;
-                    worldRenderers[1][i].enabled = true;
-                    worldRenderers[1][i].color = opaque;
+                    if (p2 == false)
+                    {
+                        //Debug.Log("Done bein' pressed");
+                        worldRenderers[1][i].sortingOrder += 1;
+                        //Debug.Log(worldRenderers[1][i].sortingOrder);
+                        worldRenderers[1][i].enabled = true;
+                        worldRenderers[1][i].color = opaque;
+                    }
                     buttonsPressed[1] = true;
                 }
             }
+            if (p2 == false) p2 = true;
         }
         else if (Input.GetAxisRaw(IM.previewY) < 0 && worldRenderers[3] != null && activeWorld != worlds[3])
         {
@@ -323,16 +342,26 @@ public class WorldSwitcher : MonoBehaviour {
             {
                 if (worldRenderers[3][i] != null)
                 {
-                    worldRenderers[3][i].sortingOrder = 1;
-                    worldRenderers[3][i].enabled = true;
-                    worldRenderers[3][i].color = opaque;
+                    if (p4 == false)
+                    {
+                        worldRenderers[3][i].sortingOrder += 1;
+                        worldRenderers[3][i].enabled = true;
+                        worldRenderers[3][i].color = opaque;
+                    }
                     buttonsPressed[3] = true;
                 }
             }
+
+            if(p4 == false) p4 = true;
         }
 
         for(int i = 0; i != buttonsPressed.Length; ++i)
         {
+            if (p1 == false && i == 0) continue;
+            else if (p2 == false && i == 1) continue;
+            else if (p3 == false && i == 2) continue;
+            else if (p4 == false && i == 3) continue;
+
             //Debug.Log(worlds.Count);
             if(worlds[i] != null)
             {
@@ -342,11 +371,18 @@ public class WorldSwitcher : MonoBehaviour {
                     {
                         if (worldRenderers[i][j] != null)
                         {
-                            worldRenderers[i][j].sortingOrder = 0;
+                            worldRenderers[i][j].sortingOrder -= 1;
                             worldRenderers[i][j].color = solid;
                             worldRenderers[i][j].enabled = false;
                         }
                     }
+
+                    //Debug.Log("Dun bein unpressed");
+
+                    if (p1 == true) p1 = false;
+                    if (p2 == true) p2 = false;
+                    if (p3 == true) p3 = false;
+                    if (p4 == true) p4 = false;
                 }
             }
         }
@@ -441,7 +477,7 @@ public class WorldSwitcher : MonoBehaviour {
                 {
                     for (int j = 0; j != BGRenderers[i].Length; ++j)
                     {
-                        BGRenderers[activeWorldNum][j].sortingOrder = -1;
+                        //BGRenderers[activeWorldNum][j].sortingOrder = -1;
                         BGRenderers[activeWorldNum][j].enabled = true;
                     }
                 }
@@ -449,7 +485,7 @@ public class WorldSwitcher : MonoBehaviour {
                 {
                     for (int j = 0; j != BGRenderers[i].Length; ++j)
                     {
-                        BGRenderers[i][j].sortingOrder = -2;
+                        //BGRenderers[i][j].sortingOrder = -2;
                         BGRenderers[i][j].enabled = false;
                     }
                 }
