@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    bool keySet = false;
-    bool controllerSet = true;
+    public bool keySet = false;
+    public bool controllerSet = true;
 
     public string jump = "c_Jump";
     public string dash = "c_Dash";
@@ -21,27 +21,36 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        if(controllerSet && SwitchKeyboard())
+        if (keySet && SwitchController())
         {
-            //Debug.Log("Controller setting");
-            controllerSet = false;
-            SetKeyboard();
-        }
-        else if(keySet && SwitchController())
-        {
-            //Debug.Log("keyboard setting");
+            Debug.Log("keyboard setting");
             keySet = false;
             SetController();
         }
+        else if (controllerSet && SwitchKeyboard())
+        {
+            Debug.Log("Controller setting");
+            controllerSet = false;
+            SetKeyboard();
+        }
+        
     }
 
     private bool SwitchKeyboard()
     {
-        //Debug.Log("Calling SwitchKeyboard()");
+        Debug.Log("Calling SwitchKeyboard()");
 
         bool isKey = false;
 
-        if(Input.anyKey)
+        if (Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.Space) ||
+            Input.GetMouseButton(0) ||
+            Input.GetMouseButton(1) ||
+            Input.GetMouseButton(2) ||
+            Input.GetKey(KeyCode.LeftControl))
         {
             isKey = true;
         }
@@ -53,7 +62,7 @@ public class InputManager : MonoBehaviour
 
     private bool SwitchController()
     {
-        //Debug.Log("Calling SwitchController()");
+        Debug.Log("Calling SwitchController()");
 
         bool isController = false;
 
@@ -90,12 +99,12 @@ public class InputManager : MonoBehaviour
             isController = true;
         }
 
-            return isController;
+        return isController;
     }
 
     private void SetKeyboard()
     {
-        //Debug.Log("KeyboardSet");
+        Debug.Log("KeyboardSet");
 
         jump = "k_Jump";
         dash = "k_Dash";
@@ -109,7 +118,7 @@ public class InputManager : MonoBehaviour
         previewY = "k_previewY";
         useItem = "k_UseItem";
 
-    keySet = true;
+        keySet = true;
     }
 
     private void SetController()

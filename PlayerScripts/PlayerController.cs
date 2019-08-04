@@ -405,7 +405,7 @@ public class PlayerController : MonoBehaviour {
         {
             StartCoroutine(HasJumped());
             jumpDown = true;
-            //Debug.Log("Jump key pressed");
+            Debug.Log("Jump key pressed");
         }
         else
         {
