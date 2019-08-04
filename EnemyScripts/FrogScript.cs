@@ -35,7 +35,7 @@ public class FrogScript : EnemyBase
     float xLength;
     //Set to false after jump is completed****
     bool ySet = false;
-    public float hopAdjust;
+    float hopAdjust;
     float originalYPosition;
 
     float oldHealth;
@@ -60,6 +60,8 @@ public class FrogScript : EnemyBase
         anim = GetComponent<Animator>();
         oldHealth = health;
         deathWait = deathClip.length * 3;
+
+        hopAdjust = hopHeight * Mathf.Pow(xLength - halfD, 2);
     }
 
     private void Update()

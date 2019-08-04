@@ -92,6 +92,7 @@ public class BatScriptFORBAT : EnemyBase
             if(deathTimer >= deathWait)
             {
                 wS.DestroyEnemyValue(hash);
+                wS.DestroyEnemyValue(detector.hash);
                 detector.destroyThis = true;
                 Destroy(gameObject);
             }

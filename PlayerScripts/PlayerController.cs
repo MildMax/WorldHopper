@@ -525,7 +525,7 @@ public class PlayerController : MonoBehaviour {
             }
             else if(body.velocity.y > downVelocity)
             {
-                Debug.Log("Holding down down");
+                //Debug.Log("Holding down down");
                 body.velocity = new Vector2(body.velocity.x, downVelocity);
             }
         }
