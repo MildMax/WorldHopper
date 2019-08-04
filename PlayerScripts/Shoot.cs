@@ -31,7 +31,7 @@ public class Shoot : MonoBehaviour {
         itemSwitcherAlt = GetComponentInParent<ItemSwitcherAlt>();
         playerController = GetComponentInParent<PlayerController>();
         parentTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
         energyScript = GameObject.FindGameObjectWithTag("EnergySlider").GetComponent<RaygunEnergyScript>();
         shootPoints = GetShootPoints();
     }

@@ -18,7 +18,7 @@ public class ThrowBomb : MonoBehaviour {
     {
         //itemSwitcher = GetComponentInParent<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInParent<ItemSwitcherAlt>();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
         playerController = GetComponentInParent<PlayerController>();
         counterScript = GameObject.FindGameObjectWithTag("BombCanvas").GetComponentInChildren<BombCounterScript>();
         throwPoints = GetThrowPoints();

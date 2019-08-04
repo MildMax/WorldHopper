@@ -55,7 +55,7 @@ public class WorldSwitcher : MonoBehaviour {
         SetLevel();
         SetActiveWorld(activeWorldNum);
         //SetInitialBG();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
     }
 
     //private void Update()

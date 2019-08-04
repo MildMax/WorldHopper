@@ -54,7 +54,7 @@ public class ItemSwitcherAlt : MonoBehaviour
     private void Awake()
     {
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
         GetRenderers();
 
         //Debug.Log(renderers.Length);

@@ -188,7 +188,7 @@ public class PlayerController : MonoBehaviour {
         rend = GetComponent<SpriteRenderer>();
         previousDirection = transform.position.x;
         direction = awakeDirection;
-        IM = GetComponent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
         worldSwitcher = GetComponentInChildren<WorldSwitcher>();
         halfCollSizeX = new Vector3((boxCollider.size.x / 2) - (boxCollider.size.x / 10), 0f, 0f);
         halfCollSizeY = new Vector3(0f, boxCollider.size.y / 2, 0f);

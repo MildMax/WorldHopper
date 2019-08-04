@@ -66,7 +66,7 @@ public class RenderLayerListener : MonoBehaviour
                 if(l[j].worldNum == i)
                 {
                     SpriteRenderer[] rends = l[j].gameObject.GetComponentsInChildren<SpriteRenderer>();
-                    for (int h = rends.Length - 1; h >= 0; --h) { rends[h].sortingOrder = currentLayer; Debug.Log(rends[h].gameObject.name); --currentLayer;}
+                    for (int h = rends.Length - 1; h >= 0; --h) { rends[h].sortingOrder = currentLayer; /*Debug.Log(rends[h].gameObject.name);*/ --currentLayer;}
                 }
             }
 

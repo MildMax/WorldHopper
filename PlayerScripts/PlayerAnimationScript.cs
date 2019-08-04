@@ -25,7 +25,7 @@ public class PlayerAnimationScript : MonoBehaviour {
         animator = GetComponent<Animator>();
         playerController = GetComponent<PlayerController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        IM = GetComponent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
     }
 
     //private void Update()
