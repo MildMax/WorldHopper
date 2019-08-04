@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GhostTriggerScript : MonoBehaviour
+public class GhostTriggerScript : EnemyBase
 {
     [HideInInspector]
     public bool inVicinity = false;

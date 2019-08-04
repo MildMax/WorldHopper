@@ -174,6 +174,10 @@ public class PlayerController : MonoBehaviour {
     [HideInInspector]
     public bool isDead = false;
 
+    public float downwardVel;
+    Vector2 downVelocity;
+
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -190,7 +194,8 @@ public class PlayerController : MonoBehaviour {
         halfCollSizeY = new Vector3(0f, boxCollider.size.y / 2, 0f);
         offset = transform.position.x - previousDirection;
         deathTime = 2;
-        deathSwitch = deathTime / 6; 
+        deathSwitch = deathTime / 6;
+        downVelocity = new Vector2(0, downwardVel);
     }
 
     //private void FixedUpdate()
@@ -327,6 +332,7 @@ public class PlayerController : MonoBehaviour {
     public void PerformKeyPresses()
     {
         Move();
+        HoldDown();
 
         if ((grounded || doubleJump == false) && jumpDown == true)
         {
@@ -508,6 +514,22 @@ public class PlayerController : MonoBehaviour {
                 body.velocity = new Vector2(Input.GetAxisRaw(IM.horizontal) * speed, body.velocity.y);
             }
         }       
+    }
+
+    private void HoldDown()
+    {
+        if(!grounded && !isDashing && Input.GetAxisRaw(IM.vertical) < 0)
+        {
+            if(inWater)
+            {
+                body.velocity -= (downVelocity / 4);
+            }
+            else
+            {
+                Debug.Log("Holding down down");
+                body.velocity -= downVelocity;
+            }
+        }
     }
 
     //If player is in the air, checks the distance from the character to the ground, and starts Coroutine when it is close to the ground

@@ -7,7 +7,7 @@ using UnityEditor;
 [CanEditMultipleObjects]
 public class LayerAssignmentGUI : Editor
 {
-    string[] worldOptions = { "1", "2", "3", "4" };
+    string[] worldOptions = { "1", "2", "3", "4", "NULL" };
     SerializedProperty worldNum;
 
     string[] layerOptions = {
@@ -50,7 +50,22 @@ public class LayerAssignmentGUI : Editor
 
         GUILayout.EndHorizontal();
 
+        SetNull();
+
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void SetNull()
+    {
+        switch(layerImportance.intValue)
+        {
+            case 0:
+            case 2:
+            case 6:
+            case 7:
+                worldNum.intValue = 4;
+                break;
+        }
     }
 
 }

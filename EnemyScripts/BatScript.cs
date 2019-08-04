@@ -32,7 +32,7 @@ public class BatScript : EnemyBase
 
     float oldHealth;
 
-    bool set = false;
+    bool set = true;
     bool startFall = false;
     bool isDead = false;
     float deathTime;

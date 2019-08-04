@@ -18,7 +18,7 @@ public class RenderLayerListener : MonoBehaviour
 
         currentLayer = l.Length;
 
-        Debug.Log(currentLayer);
+        //Debug.Log(currentLayer);
 
         for (int j = 0; j != 9; ++j)
         {
@@ -36,14 +36,14 @@ public class RenderLayerListener : MonoBehaviour
             {
                 BufferLayer(j);
                 if (j == 0 || j == 2 || j == 6 || j == 7)
-                { SetSingle(lList); Debug.Log("Setting single on layer " + j); }
+                { SetSingle(lList); /*Debug.Log("Setting single on layer " + j);*/ }
                 else
-                { SetMultiple(lList); Debug.Log("Setting multiple on layer " + j); }
+                { SetMultiple(lList); /*Debug.Log("Setting multiple on layer " + j);*/ }
                 BufferLayer(j);
             }
         }
 
-        Debug.Log(currentLayer);
+        //Debug.Log(currentLayer);
     }
 
     private void SetSingle(List<LayerAssignmentScript> l)
@@ -51,7 +51,7 @@ public class RenderLayerListener : MonoBehaviour
         for (int i = 0; i != l.Count; ++i)
         {
             SpriteRenderer[] rends = l[i].gameObject.GetComponentsInChildren<SpriteRenderer>();
-            for (int j = 0; j != rends.Length; ++j) { rends[j].sortingOrder = currentLayer; Debug.Log(rends[j].gameObject.name); }
+            for (int j = 0; j != rends.Length; ++j) { rends[j].sortingOrder = currentLayer; /*Debug.Log(rends[j].gameObject.name);*/ }
             
         }
         --currentLayer;
@@ -61,7 +61,7 @@ public class RenderLayerListener : MonoBehaviour
     {
         for(int i = 0; i != 4; ++i)
         {
-            for(int j = l.Count - 1; j >= 0; --j)
+            for(int j = 0; j != l.Count; ++j)
             {
                 if(l[j].worldNum == i)
                 {
