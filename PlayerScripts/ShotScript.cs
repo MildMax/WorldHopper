@@ -54,7 +54,7 @@ public class ShotScript : MonoBehaviour {
         {
             val = true;
         }
-        else if (coll.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("Enemy") && coll.gameObject.tag != "Detector")
         {
             val = true;
         }
