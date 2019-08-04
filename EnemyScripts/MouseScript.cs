@@ -41,6 +41,8 @@ public class MouseScript : EnemyBase
 
     float oldHealth;
 
+    public int worldNum = 4;
+
     private void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
@@ -51,10 +53,12 @@ public class MouseScript : EnemyBase
         oldHealth = health;
         deathWait = deathClip.length * 3;
         SetCondition();
+        GetWorldNum();
     }
 
     private void Update()
     {
+        GetWorldNum();
         CheckHealth();
         if (isDead == false)
         {
@@ -183,15 +187,18 @@ public class MouseScript : EnemyBase
 
     private void HideRenderer()
     {
-        if((Vector2)transform.position == pos1 || (Vector2)transform.position == pos2)
+        if (wS.activeWorldNum == worldNum)
         {
-            rend.enabled = false;
-            coll.enabled = false;
-        }
-        else
-        {
-            rend.enabled = true;
-            coll.enabled = true;
+            if ((Vector2)transform.position == pos1 || (Vector2)transform.position == pos2)
+            {
+                rend.enabled = false;
+                coll.enabled = false;
+            }
+            else
+            {
+                rend.enabled = true;
+                coll.enabled = true;
+            }
         }
     }
 
@@ -223,6 +230,17 @@ public class MouseScript : EnemyBase
         if(collision.gameObject.tag == "Player")
         {
             collision.gameObject.GetComponent<PlayerController>().GetHurt(coll.transform.position);
+        }
+    }
+
+    private void GetWorldNum()
+    {
+        if (worldNum == 4)
+        {
+            if (hash.Contains("W1")) worldNum = 0;
+            else if (hash.Contains("W2")) worldNum = 1;
+            else if (hash.Contains("W3")) worldNum = 2;
+            else if (hash.Contains("W4")) worldNum = 3;
         }
     }
 

@@ -174,8 +174,8 @@ public class PlayerController : MonoBehaviour {
     [HideInInspector]
     public bool isDead = false;
 
-    public float downwardVel;
-    Vector2 downVelocity;
+    float waterDownVelocity = -2;
+    float downVelocity = -10;
 
 
     private void Awake()
@@ -195,7 +195,6 @@ public class PlayerController : MonoBehaviour {
         offset = transform.position.x - previousDirection;
         deathTime = 2;
         deathSwitch = deathTime / 6;
-        downVelocity = new Vector2(0, downwardVel);
     }
 
     //private void FixedUpdate()
@@ -520,14 +519,14 @@ public class PlayerController : MonoBehaviour {
     {
         if(!grounded && !isDashing && Input.GetAxisRaw(IM.vertical) < 0)
         {
-            if(inWater)
+            if(inWater && body.velocity.y > -2)
             {
-                body.velocity -= (downVelocity / 4);
+                body.velocity = new Vector2(body.velocity.x, waterDownVelocity);
             }
-            else
+            else if(body.velocity.y > downVelocity)
             {
                 Debug.Log("Holding down down");
-                body.velocity -= downVelocity;
+                body.velocity = new Vector2(body.velocity.x, downVelocity);
             }
         }
     }

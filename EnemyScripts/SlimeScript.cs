@@ -13,7 +13,7 @@ public class SlimeScript : EnemyBase
     Animator anim;
     CapsuleCollider2D coll;
     SpriteRenderer rend;
-    Rigidbody2D body;
+    //Rigidbody2D body;
     Vector2[] autoWalkPoints = new Vector2[3] { Vector2.positiveInfinity, Vector2.positiveInfinity, Vector2.positiveInfinity };
     Vector2[] autoWalkExtents = new Vector2[2];
     WorldSwitcher wS;
@@ -35,7 +35,7 @@ public class SlimeScript : EnemyBase
 
     bool ignore = false;
 
-    bool isGrounded = false;
+    //bool isGrounded = false;
 
     public string groundLayer;
 
@@ -44,17 +44,20 @@ public class SlimeScript : EnemyBase
 
     float oldHealth;
 
+    bool autoWalkSet = false;
+
     private void Awake()
     {
-        SetInitWalk();
+        
         coll = GetComponent<CapsuleCollider2D>();
         rend = GetComponent<SpriteRenderer>();
-        body = GetComponent<Rigidbody2D>();
+        //body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         autoWalkPoints = SetAutoWalk();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         groundLayer = "Ground" + (worldNum + 1);
+        SetInitWalk();
         oldHealth = health;
         deathTime = deathAnim.length * 3;
     }
@@ -66,8 +69,9 @@ public class SlimeScript : EnemyBase
 
     private void FixedUpdate()
     {
-        SetCollisionType();
-        SwitchColliderType();
+        //SetCollisionType();
+        //SwitchColliderType();
+        //if (!autoWalkSet) SetAutoWalk();
         walkType();
     }
 
@@ -123,29 +127,29 @@ public class SlimeScript : EnemyBase
         }
     }
 
-    private void SetCollisionType()
-    {
-        if(body.isKinematic == false)
-        {
-            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        }
-        else
-        {
-            body.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
-        }
-    }
+    //private void SetCollisionType()
+    //{
+    //    if(body.isKinematic == false)
+    //    {
+    //        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+    //    }
+    //    else
+    //    {
+    //        body.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+    //    }
+    //}
 
-    private void SwitchColliderType()
-    {
-        if(isGrounded == false)
-        {
-            coll.isTrigger = true;
-        }
-        else if(isGrounded == true)
-        {
-            coll.isTrigger = false;
-        }
-    }
+    //private void SwitchColliderType()
+    //{
+    //    if(isGrounded == false)
+    //    {
+    //        coll.isTrigger = true;
+    //    }
+    //    else if(isGrounded == true)
+    //    {
+    //        coll.isTrigger = false;
+    //    }
+    //}
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -176,7 +180,7 @@ public class SlimeScript : EnemyBase
             {
                 coll.enabled = false;
                 anim.SetBool("IsDead", true);
-                body.isKinematic = true;
+                //body.isKinematic = true;
                 walkType = NoWalk;
                 isDead = true;
             }
@@ -207,11 +211,7 @@ public class SlimeScript : EnemyBase
 
     public void AutoWalk()
     {
-        if (autoWalkPoints[2] == Vector2.positiveInfinity
-            || transform.position.x < autoWalkPoints[0].x - 0.5f
-            || transform.position.x > autoWalkPoints[1].x + 0.5f
-            || transform.position.y > autoWalkPoints[0].y + 0.5f
-            || transform.position.z < autoWalkPoints[0].y - 0.5f)
+        if (!autoWalkSet)
         {
 
             //Debug.Log("Setting points");
@@ -219,10 +219,10 @@ public class SlimeScript : EnemyBase
         }
         else
         {
-            body.isKinematic = true;
-            isGrounded = true;
+            //body.isKinematic = true;
+            //isGrounded = true;
             transform.position = new Vector2(transform.position.x, autoWalkPoints[0].y);
-            body.velocity = Vector2.zero;
+            //body.velocity = Vector2.zero;
             //Debug.Log("Walking");
             Walk(autoWalkPoints);
         }
@@ -232,11 +232,16 @@ public class SlimeScript : EnemyBase
 
     private Vector2[] SetAutoWalk()
     {
+        //Debug.Log("Setting auto walk");
+
         transform.rotation = Quaternion.Euler(Vector3.zero);
 
-        Vector2[] results = new Vector2[3] {Vector2.positiveInfinity, Vector2.positiveInfinity, Vector2.positiveInfinity };
+        Vector2[] results = new Vector2[3];
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, (rend.size.y / 2) + 0.25f, LayerMask.GetMask(groundLayer));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, (coll.size.y), LayerMask.GetMask(groundLayer));
+
+        //Debug.Log(hit.transform.gameObject.name);
+        Debug.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - coll.size.y, 0f), Color.red);
 
         if(hit)
         {
@@ -253,7 +258,7 @@ public class SlimeScript : EnemyBase
 
             //Debug.Log(hit.transform.gameObject.layer.ToString());
 
-            RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, distanceL, LayerMask.GetMask(groundLayer));
+            RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, distanceL + 0.3f, LayerMask.GetMask(groundLayer));
 
             //if(hitLeft)
             //{
@@ -269,7 +274,7 @@ public class SlimeScript : EnemyBase
             //CHECK THIS:::::::::::::::::::::::::
             float distanceR = (hit.transform.position.x - hit.point.x) + hit.collider.bounds.extents.x;
 
-            RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, distanceR, LayerMask.GetMask(groundLayer));
+            RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, distanceR + 0.3f, LayerMask.GetMask(groundLayer));
 
             //if(hitRight)
             //{
@@ -283,13 +288,13 @@ public class SlimeScript : EnemyBase
                 results[1] = new Vector2(transform.position.x + hitRight.distance - (rend.size.x / 2), results[0].y);
             }
 
-            
+            autoWalkSet = true;
         }
-        else
-        {
-            body.isKinematic = false;
-            isGrounded = false;
-        }
+        //else
+        //{
+        //    body.isKinematic = false;
+        //    isGrounded = false;
+        //}
         //if (hit)
         //{
             //Debug.Log(hit.transform.position.x + " - " + hit.collider.bounds.extents.x);
