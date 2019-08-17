@@ -54,6 +54,8 @@ public class MouseScript : EnemyBase
         deathWait = deathClip.length * 3;
         SetCondition();
         GetWorldNum();
+        SetInitialPos();
+        HideRenderer();
     }
 
     private void Update()
@@ -285,6 +287,18 @@ public class MouseScript : EnemyBase
         {
             timeWait = Random.Range(minWait, maxWait);
             timerSet = true;
+        }
+    }
+
+    private void SetInitialPos()
+    {
+        if(isLeft == true)
+        {
+            transform.position = pos1;
+        }
+        else if(isLeft == false)
+        {
+            transform.position = pos2;
         }
     }
 
