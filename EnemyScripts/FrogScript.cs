@@ -15,6 +15,7 @@ public class FrogScript : EnemyBase
     CircleCollider2D coll;
     WorldSwitcher wS;
     Animator anim;
+    SpriteRenderer rend;
 
     public float hopDistance;
     float halfD;
@@ -58,6 +59,7 @@ public class FrogScript : EnemyBase
         coll = GetComponent<CircleCollider2D>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         anim = GetComponent<Animator>();
+        rend = GetComponent<SpriteRenderer>();
         oldHealth = health;
         deathWait = deathClip.length * 3;
 
@@ -67,6 +69,7 @@ public class FrogScript : EnemyBase
     private void Update()
     {
         CheckHealth();
+        FlipSprites();
     }
 
     //Consider moving ChangeDirection + MoveFrog to Update
@@ -227,6 +230,12 @@ public class FrogScript : EnemyBase
         {
             direction = 1;
         }
+    }
+
+    private void FlipSprites()
+    {
+        if (direction == 1) rend.flipX = true;
+        else rend.flipX = false;
     }
 
     private void Fall()

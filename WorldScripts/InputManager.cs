@@ -23,13 +23,13 @@ public class InputManager : MonoBehaviour
     {
         if (keySet && SwitchController())
         {
-            Debug.Log("keyboard setting");
+            //Debug.Log("keyboard setting");
             keySet = false;
             SetController();
         }
         else if (controllerSet && SwitchKeyboard())
         {
-            Debug.Log("Controller setting");
+            //Debug.Log("Controller setting");
             controllerSet = false;
             SetKeyboard();
         }
@@ -38,7 +38,7 @@ public class InputManager : MonoBehaviour
 
     private bool SwitchKeyboard()
     {
-        Debug.Log("Calling SwitchKeyboard()");
+        //Debug.Log("Calling SwitchKeyboard()");
 
         bool isKey = false;
 
@@ -62,7 +62,7 @@ public class InputManager : MonoBehaviour
 
     private bool SwitchController()
     {
-        Debug.Log("Calling SwitchController()");
+        //Debug.Log("Calling SwitchController()");
 
         bool isController = false;
 
