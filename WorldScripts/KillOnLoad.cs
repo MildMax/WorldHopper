@@ -23,11 +23,17 @@ public class KillOnLoad : MonoBehaviour {
     Vector2 size;
     Collider2D coll;
 
+    Vector2 maxVal;
+    Vector2 minVal;
+    Vector2 playerDims;
+
     private void Awake()
     {
         coll = GetComponent<Collider2D>();
         size = (Vector2)coll.bounds.size;
+        playerDims = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>().size;
         pos = coll.transform;
+        CreateInnerBox();
     }
 
     private void FixedUpdate()
@@ -45,7 +51,14 @@ public class KillOnLoad : MonoBehaviour {
             //Debug.Log(overlaps == null);
             //Debug.Log(overlaps.name);
 
-            if (overlaps != null && overlaps.name == "Player")
+            bool isClose = false;
+
+            if (overlaps != null)
+            {
+                isClose = CheckPlayerProx(overlaps);
+            }
+
+            if (overlaps != null && overlaps.name == "Player" && isClose == true)
             {
                 PlayerController p = overlaps.gameObject.GetComponent<PlayerController>();
                 p.boxCollider.enabled = false;
@@ -53,6 +66,23 @@ public class KillOnLoad : MonoBehaviour {
             }
             
         }
+    }
+
+    private bool CheckPlayerProx(Collider2D o)
+    {
+        bool isClose = false;
+
+        if(
+            o.transform.position.x < maxVal.x &&
+            o.transform.position.x > minVal.x &&
+            o.transform.position.y < maxVal.y &&
+            o.transform.position.y > minVal.y
+            )
+        {
+            isClose = true;
+        }
+
+        return isClose;
     }
 
     private void CheckEnabled()
@@ -65,6 +95,17 @@ public class KillOnLoad : MonoBehaviour {
         {
             isEnabled = false;
         }
+    }
+
+    private void CreateInnerBox()
+    {
+        maxVal = new Vector2(
+            coll.transform.position.x + coll.bounds.extents.x - (playerDims.x / 2),
+            coll.transform.position.y + coll.bounds.extents.y - (playerDims.y / 2));
+
+        minVal = new Vector2(
+            coll.transform.position.x - coll.bounds.extents.x + (playerDims.x / 2),
+            coll.transform.position.y - coll.bounds.extents.y + (playerDims.y / 2));
     }
 
 }
