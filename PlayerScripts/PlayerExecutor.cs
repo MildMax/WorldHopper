@@ -90,6 +90,8 @@ public class PlayerExecutor : MonoBehaviour
         //playerController.vel = playerController.body.velocity;
         playerController.InvulnerableOnHurt();
 
+        playerController.DetectInteract();
+
         playerController.CheckKeyInput();
         if (playerAnimationScript.hurt == false)
         {

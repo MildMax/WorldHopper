@@ -72,6 +72,16 @@ public class JewelScript : CollectableBase
         }
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Player" && worldNum.Value == wS.activeWorldNum)
+        {
+            //add value to be read and displayed on HUD here
+            jS.jewelCount += 1;
+            Destroy(gameObject);
+        }
+    }
+
     private void GetWorldNum()
     {
         if(!worldNum.HasValue)

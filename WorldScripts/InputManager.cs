@@ -18,6 +18,7 @@ public class InputManager : MonoBehaviour
     public string previewX = "c_previewX";
     public string previewY = "c_previewY";
     public string useItem = "c_UseItem";
+    public string interact = "c_Interact";
 
     private void Update()
     {
@@ -117,6 +118,7 @@ public class InputManager : MonoBehaviour
         previewX = "k_previewX";
         previewY = "k_previewY";
         useItem = "k_UseItem";
+        interact = "k_Interact";
 
         keySet = true;
     }
@@ -136,6 +138,7 @@ public class InputManager : MonoBehaviour
         previewX = "c_previewX";
         previewY = "c_previewY";
         useItem = "c_UseItem";
+        interact = "c_Interact";
 
         controllerSet = true;
     }

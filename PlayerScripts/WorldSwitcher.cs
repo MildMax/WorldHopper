@@ -135,13 +135,18 @@ public class WorldSwitcher : MonoBehaviour {
                         }
                         worldColliders[i][j] = null;
                     }
-                    else if(worldColliders[i][j].gameObject.tag == "Collectable")
+                    else if (worldColliders[i][j].gameObject.tag == "Collectable")
                     {
                         worldColliders[i][j].gameObject.GetComponent<CollectableBase>().worldNum = i;
                         worldColliders[i][j] = null;
                     }
                     else if (worldColliders[i][j].tag == "WaterCollider")
                     {
+                        worldColliders[i][j] = null;
+                    }
+                    else if (worldColliders[i][j].gameObject.layer == LayerMask.NameToLayer("Item"))
+                    {
+                        worldColliders[i][j].gameObject.GetComponent<SwitchScript>().worldNum = i;
                         worldColliders[i][j] = null;
                     }
                 }

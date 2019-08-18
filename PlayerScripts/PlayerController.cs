@@ -177,6 +177,8 @@ public class PlayerController : MonoBehaviour {
     float waterDownVelocity = -2;
     float downVelocity = -10;
 
+    [HideInInspector]
+    public bool isInteract = false;
 
     private void Awake()
     {
@@ -791,4 +793,9 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    public void DetectInteract()
+    {
+        if (Input.GetButtonDown(IM.interact) && playerAnimScript.hurt == false) isInteract = true;
+        else isInteract = false;
+    }
 }
