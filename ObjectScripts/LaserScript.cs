@@ -31,10 +31,13 @@ public class LaserScript : EnemyBase
     Arr<GameObject> laserSections = new Arr<GameObject>();
 
     public bool isOn;
+    public bool isPersistent;
     bool isActive = false;
     public int channel;
     bool hasSwitch = false;
     bool isDeactivated = false;
+
+    bool laserSet = false;
 
     private void Awake()
     {
@@ -45,11 +48,18 @@ public class LaserScript : EnemyBase
         SetSprite(direction);
         GenerateBeam();
         FindSwitch();
+        SetInitialState();
     }
 
     private void Update()
     {
         SwitchListener();
+
+        if (!laserSet)
+        {
+            GenerateBeam();
+            SetInitialState();
+        }
 
         if (isOn) ManageLaser();
         else DeactivateLaser();
@@ -60,7 +70,10 @@ public class LaserScript : EnemyBase
         Vector3 rayDir = GetRayDirection(direction);
         RaycastHit2D hit = Physics2D.Raycast(points[direction], rayDir, 100f, LayerMask.GetMask("Ground" + (worldNum + 1), "Wall" + (worldNum + 1)));
 
-        if (!hit) Debug.Log("Laser has not hit shit");
+        if (hit) Debug.DrawLine(points[direction], hit.point);
+        else Debug.DrawLine(points[direction], rayDir * 100f);
+
+        if (!hit) Debug.Log("Laser has not hit shit. Retrying...");
         else
         {
             int sections = (int)(hit.distance / 0.35f);
@@ -78,6 +91,8 @@ public class LaserScript : EnemyBase
                 laserSections.laserArray[i].transform.SetParent(this.gameObject.transform);
                 laserSections.laserArray[i].SetActive(false);
             }
+
+            laserSet = true;
         }
     }
 
@@ -135,23 +150,37 @@ public class LaserScript : EnemyBase
 
     private void ManageLaser()
     {
-        if (isDeactivated == true) isDeactivated = false;
+        if (!isPersistent)
+        {
+            if (isDeactivated == true) isDeactivated = false;
 
-        if(isActive == false && worldNum == wS.activeWorldNum)
-        {
-            for(int i = 0; i != laserSections.laserArray.Length; ++i)
+            if (isActive == false && worldNum == wS.activeWorldNum)
             {
-                laserSections.laserArray[i].SetActive(true);
+                for (int i = 0; i != laserSections.laserArray.Length; ++i)
+                {
+                    laserSections.laserArray[i].SetActive(true);
+                }
+                isActive = true;
             }
-            isActive = true;
+            else if (isActive = true && worldNum != wS.activeWorldNum)
+            {
+                for (int i = 0; i != laserSections.laserArray.Length; ++i)
+                {
+                    laserSections.laserArray[i].SetActive(false);
+                }
+                isActive = false;
+            }
         }
-        else if(isActive = true && worldNum != wS.activeWorldNum)
+        else
         {
-            for (int i = 0; i != laserSections.laserArray.Length; ++i)
+            if(isDeactivated == true)
             {
-                laserSections.laserArray[i].SetActive(false);
+                for (int i = 0; i != laserSections.laserArray.Length; ++i)
+                {
+                    laserSections.laserArray[i].SetActive(true);
+                }
+                isDeactivated = false;
             }
-            isActive = false;
         }
     }
 
@@ -164,6 +193,20 @@ public class LaserScript : EnemyBase
                 laserSections.laserArray[i].SetActive(false);
             }
             isDeactivated = true;
+        }
+    }
+
+    private void SetInitialState()
+    {
+        if (isOn)
+        {
+            isDeactivated = true;
+            ManageLaser();
+        }
+        else
+        {
+            isDeactivated = false;
+            DeactivateLaser();
         }
     }
 

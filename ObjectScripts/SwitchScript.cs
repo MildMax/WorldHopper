@@ -6,6 +6,7 @@ public class SwitchScript : MonoBehaviour
 {
     public int channel;
     public bool isOn;
+    public bool isPersistent;
     [HideInInspector]
     public int worldNum;
 
@@ -42,7 +43,7 @@ public class SwitchScript : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         //Debug.Log("Colliding");
-        if (collision.gameObject.tag == "Player" && wS.activeWorldNum == worldNum)
+        if (collision.gameObject.tag == "Player" && (wS.activeWorldNum == worldNum || isPersistent))
         {
             if (playerController.isInteract)
             {
