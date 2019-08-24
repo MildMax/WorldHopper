@@ -181,6 +181,7 @@ public class PlayerController : MonoBehaviour {
     public bool isInteract = false;
 
     public bool onPlatform = false;
+    public bool isInPlatform = false;
 
     public float fallAcceleration;
 
@@ -410,7 +411,13 @@ public class PlayerController : MonoBehaviour {
         {
             grounded = false;
             onPlatform = false;
-        } 
+        }
+        
+        if(isInPlatform)
+        {
+            grounded = false;
+            onPlatform = false;
+        }
     }
 
     //Checks what keys are being pressed
@@ -420,6 +427,7 @@ public class PlayerController : MonoBehaviour {
         if(Input.GetButtonDown(IM.jump) && Input.GetAxisRaw(IM.vertical) < 0 && onPlatform == true)
         {
             ground.collider.gameObject.GetComponent<PlatformColliderScript>().MakeTrigger();
+            isInPlatform = true;
             Debug.Log("Dropping through platform");
         }
         else if (Input.GetButtonDown(IM.jump))

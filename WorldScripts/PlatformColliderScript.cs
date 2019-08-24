@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +7,7 @@ public class PlatformColliderScript : MonoBehaviour
     GameObject player;
     BoxCollider2D coll;
     Collider2D playerColl;
+    PlayerController playerController;
 
     [HideInInspector]
     public bool madeTrigger = false;
@@ -20,6 +21,7 @@ public class PlatformColliderScript : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").gameObject;
         playerColl = player.GetComponent<Collider2D>();
+        playerController = player.GetComponent<PlayerController>();
         coll = GetComponent<BoxCollider2D>();
         yPos = coll.transform.position.y;
         
@@ -27,45 +29,46 @@ public class PlatformColliderScript : MonoBehaviour
 
     private void Update()
     {
-        //if(debugTrigger)
-        //{
-        //    MakeTrigger();
-        //}
-
-        TurnTriggerBackOn();
-    }
-
-    public void MakeTrigger()
-    {
-        playerYPos = player.transform.position.y;
-        coll.enabled = false;
-    }
-
-    private void TurnTriggerBackOn()
-    {
-        if (coll.enabled == false)
+        if (debugTrigger)
         {
-            if (player.transform.position.y > playerYPos ||
-                player.transform.position.y < yPos - playerColl.bounds.extents.y) coll.enabled = true;
-            
+            MakeTrigger();
         }
+
+        //TurnTriggerBackOn();
     }
 
     //public void MakeTrigger()
     //{
-    //    madeTrigger = true;
-    //    coll.isTrigger = true;
+    //    playerYPos = player.transform.position.y;
+    //    coll.enabled = false;
     //}
 
-    //private void OnTriggerExit2D(Collider2D collision)
+    //private void TurnTriggerBackOn()
     //{
-    //    if(madeTrigger && collision.tag == "Player")
+    //    if (coll.enabled == false)
     //    {
-    //        coll.isTrigger = false;
-    //        madeTrigger = false;
+    //        if (player.transform.position.y > playerYPos ||
+    //            player.transform.position.y < yPos - playerColl.bounds.extents.y) coll.enabled = true;
 
-    //        debugTrigger = false;
     //    }
     //}
+
+    public void MakeTrigger()
+    {
+        madeTrigger = true;
+        coll.isTrigger = true;
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (madeTrigger && collision.tag == "Player")
+        {
+            coll.isTrigger = false;
+            madeTrigger = false;
+            playerController.isInPlatform = false;
+
+            debugTrigger = false;
+        }
+    }
 
 }
