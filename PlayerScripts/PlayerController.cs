@@ -180,6 +180,10 @@ public class PlayerController : MonoBehaviour {
     [HideInInspector]
     public bool isInteract = false;
 
+    public bool onPlatform = false;
+
+    public float fallAcceleration;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -386,6 +390,15 @@ public class PlayerController : MonoBehaviour {
                 ground = right;
             }
 
+            if(ground.collider.gameObject.tag == "Platform")
+            {
+                onPlatform = true;
+            }
+            else
+            {
+                onPlatform = false;
+            }
+
             if(body.velocity.y <= 0)
             {
                 grounded = true;
@@ -396,6 +409,7 @@ public class PlayerController : MonoBehaviour {
         else
         {
             grounded = false;
+            onPlatform = false;
         } 
     }
 
@@ -403,7 +417,12 @@ public class PlayerController : MonoBehaviour {
     public void CheckKeyInput()
     {
         //jump key
-        if (Input.GetButtonDown(IM.jump))
+        if(Input.GetButtonDown(IM.jump) && Input.GetAxisRaw(IM.vertical) < 0 && onPlatform == true)
+        {
+            ground.collider.gameObject.GetComponent<PlatformColliderScript>().MakeTrigger();
+            Debug.Log("Dropping through platform");
+        }
+        else if (Input.GetButtonDown(IM.jump))
         {
             StartCoroutine(HasJumped());
             jumpDown = true;
@@ -528,8 +547,11 @@ public class PlayerController : MonoBehaviour {
             else if(body.velocity.y > downVelocity)
             {
                 //Debug.Log("Holding down down");
-                body.velocity = new Vector2(body.velocity.x, downVelocity);
+
+                body.velocity = new Vector2(body.velocity.x, Mathf.Lerp(body.velocity.y, downVelocity, (body.velocity.y - downVelocity) * fallAcceleration * Time.deltaTime));
             }
+            else if(body.velocity.y <= downVelocity)
+            { body.velocity = new Vector2(body.velocity.x, downVelocity); }
         }
     }
 

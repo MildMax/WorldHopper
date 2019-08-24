@@ -70,8 +70,8 @@ public class LaserScript : EnemyBase
         Vector3 rayDir = GetRayDirection(direction);
         RaycastHit2D hit = Physics2D.Raycast(points[direction], rayDir, 100f, LayerMask.GetMask("Ground" + (worldNum + 1), "Wall" + (worldNum + 1)));
 
-        if (hit) Debug.DrawLine(points[direction], hit.point);
-        else Debug.DrawLine(points[direction], rayDir * 100f);
+        //if (hit) Debug.DrawLine(points[direction], hit.point);
+        //else Debug.DrawLine(points[direction], rayDir * 100f);
 
         if (!hit) Debug.Log("Laser has not hit shit. Retrying...");
         else
