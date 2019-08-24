@@ -19,10 +19,12 @@ public class WorldSwitcher : MonoBehaviour {
     //GameObject[] hardWorlds = { null, null, null, null };
     //GameObject[] softWorlds = { null, null, null, null };
 
-    SpriteRenderer[][] enemyRenderers = { null, null, null, null };
+    [HideInInspector]
+    public SpriteRenderer[][] enemyRenderers = { null, null, null, null };
     //Collider2D[][] enemyColliders = { null, null, null, null };
 
-    Dictionary<string, Collider2D>[] enemyColliders =
+    [HideInInspector]
+    public Dictionary<string, Collider2D>[] enemyColliders =
     {
         new Dictionary<string, Collider2D>(),
         new Dictionary<string, Collider2D>(),
