@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PokerScript : EnemyBase
 {
+    public float initialDelay;
+    float initDelayTimer = 0;
 
     //[SerializeField]
     [HideInInspector]
@@ -72,7 +74,8 @@ public class PokerScript : EnemyBase
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         SetActionMethod();
-        actionMethod();
+        if (initialDelay == 0) actionMethod();
+        //actionMethod();
         worldNum = GetWorldNum();
         oldHealth = health;
         deathTime = 0.667f * 3;
@@ -85,12 +88,13 @@ public class PokerScript : EnemyBase
 
         CheckHealth();
 
-        if (deathSet == false)
+        if (deathSet == false && initDelayTimer >= initialDelay)
         {
             HandleCollider();
             SetActionMethod();
             actionMethod();
         }
+        else initDelayTimer += Time.deltaTime;
     }
 
     //:::::::::GENERIC::::::::::://
