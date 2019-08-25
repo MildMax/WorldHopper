@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SnakePokerScript : EnemyBase
 {
+    public float initialDelay;
+    float initDelayTimer = 0;
+
     //[SerializeField]
     [HideInInspector]
     public int actionIndex;
@@ -75,7 +78,7 @@ public class SnakePokerScript : EnemyBase
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         SetActionMethod();
-        actionMethod();
+        if(initialDelay == 0) actionMethod();
         worldNum = GetWorldNum();
         oldHealth = health;
         deathTime = 0.667f * 3;
@@ -88,13 +91,20 @@ public class SnakePokerScript : EnemyBase
 
         CheckHealth();
 
-        if(deathSet == false)
+        if (deathSet == false && initDelayTimer >= initialDelay)
         {
-            HandleCollider();
+            
             ChangeAnimState();
             SetActionMethod();
             actionMethod();
         }
+        else initDelayTimer += Time.deltaTime;
+    }
+
+    private void LateUpdate()
+    {
+        if(!deathSet) HandleCollider();
+
     }
 
     //:::::::::GENERIC::::::::::://
@@ -136,15 +146,18 @@ public class SnakePokerScript : EnemyBase
         if(changeTimer >= animChangeTime)
         {
             //Debug.Log("Changing Animation Controller");
-            if(anim.runtimeAnimatorController == AcontrollerIdle)
+            if (worldNum == wS.activeWorldNum)
             {
-                anim.runtimeAnimatorController = BcontrollerIdle;
-                isControllerA = false;
-            }
-            else if(anim.runtimeAnimatorController == BcontrollerIdle)
-            {
-                anim.runtimeAnimatorController = AcontrollerIdle;
-                isControllerA = true;
+                if (anim.runtimeAnimatorController == AcontrollerIdle)
+                {
+                    anim.runtimeAnimatorController = BcontrollerIdle;
+                    isControllerA = false;
+                }
+                else if (anim.runtimeAnimatorController == BcontrollerIdle)
+                {
+                    anim.runtimeAnimatorController = AcontrollerIdle;
+                    isControllerA = true;
+                }
             }
 
             changeTimer = 0;

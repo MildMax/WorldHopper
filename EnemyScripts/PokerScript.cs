@@ -90,11 +90,17 @@ public class PokerScript : EnemyBase
 
         if (deathSet == false && initDelayTimer >= initialDelay)
         {
-            HandleCollider();
+            //HandleCollider();
             SetActionMethod();
             actionMethod();
         }
         else initDelayTimer += Time.deltaTime;
+    }
+
+    private void LateUpdate()
+    {
+        if (!deathSet) HandleCollider();
+
     }
 
     //:::::::::GENERIC::::::::::://
