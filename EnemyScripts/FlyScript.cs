@@ -9,7 +9,7 @@ public class FlyScript : EnemyBase
     public AnimationClip deathAnim;
     public float speed;
 
-    int direction = 1;
+    public int direction = 1;
     float oldHealth;
 
     float deathTime;
@@ -34,7 +34,7 @@ public class FlyScript : EnemyBase
 
     private void Awake()
     {
-        transform.position = pos1;
+        //transform.position = pos1;
         rend = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         body = GetComponent<Rigidbody2D>();

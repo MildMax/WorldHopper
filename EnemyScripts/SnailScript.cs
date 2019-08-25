@@ -13,7 +13,7 @@ public class SnailScript : EnemyBase
     public delegate void WalkMethod();
     WalkMethod walkMethod;
 
-    public int speed;
+    public float speed;
     public float dangerClose;
     public float deathWait;
 
