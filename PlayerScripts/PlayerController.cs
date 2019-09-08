@@ -185,6 +185,9 @@ public class PlayerController : MonoBehaviour {
 
     public float fallAcceleration;
 
+    [HideInInspector]
+    public bool isSprung = false;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -827,5 +830,21 @@ public class PlayerController : MonoBehaviour {
     {
         if (Input.GetButtonDown(IM.interact) && playerAnimScript.hurt == false) isInteract = true;
         else isInteract = false;
+    }
+
+    public void CheckSpringKinematic()
+    {
+        if (isSprung) body.isKinematic = true;
+        else body.isKinematic = false;
+    }
+
+    public void MakeKinematic()
+    {
+        body.isKinematic = true;
+    }
+
+    public void MakeDynamic()
+    {
+        body.isKinematic = false;
     }
 }

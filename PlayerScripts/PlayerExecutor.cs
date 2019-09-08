@@ -93,7 +93,8 @@ public class PlayerExecutor : MonoBehaviour
         playerController.DetectInteract();
 
         playerController.CheckKeyInput();
-        if (playerAnimationScript.hurt == false)
+        //playerController.CheckSpringKinematic();
+        if (playerAnimationScript.hurt == false && playerController.isSprung == false)
         {
             playerController.PerformKeyPresses();
         }
