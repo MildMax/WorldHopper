@@ -13,6 +13,14 @@ public class SpringScript : MonoBehaviour
     PlayerController playerController;
     BoxCollider2D coll;
     BoxCollider2D playerColl;
+    public Sprite springDown;
+    public Sprite springUp;
+    SpriteRenderer rend;
+
+    bool isDown = true;
+    bool setSpringUp = false;
+    public float springTime;
+    float springTimer = 0;
 
     public float speed;
     public float lerpSpeed;
@@ -36,6 +44,12 @@ public class SpringScript : MonoBehaviour
         playerController = player.GetComponent<PlayerController>();
         playerColl = player.GetComponent<BoxCollider2D>();
         coll = GetComponent<BoxCollider2D>();
+        rend = GetComponent<SpriteRenderer>();
+    }
+
+    private void Update()
+    {
+        ManageSpring();
     }
 
     private void FixedUpdate()
@@ -52,6 +66,7 @@ public class SpringScript : MonoBehaviour
             playerController.MakeKinematic();
             playerController.body.velocity = Vector2.zero;
             playerController.transform.position = new Vector2(coll.transform.position.x, coll.transform.position.y + coll.bounds.extents.y + playerColl.bounds.extents.y);
+            isDown = false;
         }
     }
 
@@ -119,5 +134,27 @@ public class SpringScript : MonoBehaviour
 
         if (pos1.x > pos2.x) direction = 1;
         else if (pos1.x < pos2.x) direction = -1;
+    }
+
+    private void ManageSpring()
+    {
+        if(!isDown)
+        {
+            if(!setSpringUp)
+            {
+                rend.sprite = springUp;
+                setSpringUp = true;
+            }
+
+            springTimer += Time.deltaTime;
+
+            if(springTimer >= springTime)
+            {
+                isDown = true;
+                rend.sprite = springDown;
+                springTimer = 0;
+                setSpringUp = false;
+            }
+        }
     }
 }
