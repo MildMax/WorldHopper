@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    ExitScript exit;
+
     private void Awake()
     {
-        //BoxCollider2D[] withColl = Object.FindObjectsOfType<BoxCollider2D>();
-        //for (int i = 0; i != withColl.Length; ++i) Debug.Log(withColl[i].gameObject.name);
+        exit = GetComponentInChildren<ExitScript>();
+    }
+
+    private void Update()
+    {
+        if (exit.canExit) Debug.Log("Yay, you won!");
     }
 }
