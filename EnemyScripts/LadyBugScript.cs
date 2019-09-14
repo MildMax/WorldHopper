@@ -25,7 +25,7 @@ public class LadyBugScript : EnemyBase
 
     public Vector2[] walkPoints;
     Vector2[] autoWalkPoints = null;
-    //so snail can traverse plains, but stops at a point so as not to just fuck off anywhere it can go
+    //so snail can traverse plains, but stops at a point so as not to just go anywhere
     public Vector2[] autoWalkLimits;
 
     Point destination;

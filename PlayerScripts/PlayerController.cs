@@ -618,7 +618,7 @@ public class PlayerController : MonoBehaviour {
         body.velocity = Vector2.zero;
         body.velocity = new Vector2(direction * dashVelocity, 0f);
 
-        fG = StartCoroutine(FuckGravity());
+        fG = StartCoroutine(NoGravity());
 
         yield return new WaitForSeconds(0.2f);
 
@@ -640,7 +640,7 @@ public class PlayerController : MonoBehaviour {
 
     //prevents player from dropping while dashing in the air
     //called and terminated in EnactDash() method
-    private IEnumerator FuckGravity()
+    private IEnumerator NoGravity()
     {
         bool placeHolder = true;
         while (placeHolder)
