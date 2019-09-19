@@ -73,8 +73,8 @@ public class LaserScript : EnemyBase
         //if (hit) Debug.DrawLine(points[direction], hit.point);
         //else Debug.DrawLine(points[direction], rayDir * 100f);
 
-        if (!hit) Debug.Log("Laser has not hit shit. Retrying...");
-        else
+        //if (!hit) Debug.Log("Laser has not hit shit. Retrying...");
+        if(hit)
         {
             int sections = (int)(hit.distance / 0.35f);
             if (hit.distance % 0.35f > 0.3f) sections += 1;

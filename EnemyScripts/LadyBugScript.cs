@@ -114,7 +114,10 @@ public class LadyBugScript : EnemyBase
         if (isDead == false && isFlying == false && returnToGround == false)
         {
             //anim.SetBool("IsNear", false);
-            walkMethod();
+            if (walkMethod != null)
+            {
+                walkMethod();
+            }
         }
         else if (isDead == false && isFlying == true)
         {
@@ -737,10 +740,10 @@ public class LadyBugScript : EnemyBase
         {
             limits = FindArea();
             limits.Organize();
-            Debug.Log("xMin: " + limits.xMin);
-            Debug.Log("xMax: " + limits.xMax);
-            Debug.Log("yMin: " + limits.yMin);
-            Debug.Log("yMax: " + limits.yMax);
+            //Debug.Log("xMin: " + limits.xMin);
+            //Debug.Log("xMax: " + limits.xMax);
+            //Debug.Log("yMin: " + limits.yMin);
+            //Debug.Log("yMax: " + limits.yMax);
         }
 
 
@@ -785,7 +788,7 @@ public class LadyBugScript : EnemyBase
                 );
         }
 
-        Debug.Log(newPos);
+        //Debug.Log(newPos);
 
         waitTime = Random.Range(waitMin, waitMax);
         timer = 0;
@@ -907,7 +910,7 @@ public class LadyBugScript : EnemyBase
         float height = yDistance;
 
         float length = Mathf.Abs(max - min) / 0.7f;
-        Debug.Log("Length: " + length);
+        //Debug.Log("Length: " + length);
 
         bool newHeightSet = false;
 
@@ -968,7 +971,7 @@ public class LadyBugScript : EnemyBase
 
                 if (hit)
                 {
-                    Debug.Log("hit " + hit.collider.gameObject.name + " at point (" + hit.point.x + ", " + hit.point.y + ")");
+                    //Debug.Log("hit " + hit.collider.gameObject.name + " at point (" + hit.point.x + ", " + hit.point.y + ")");
                     float xLim = Mathf.Abs(pos.x - hit.point.x);
 
                     if (xLim < height)
@@ -1020,7 +1023,7 @@ public class LadyBugScript : EnemyBase
     {
         if (snapshotTaken == false)
         {
-            Debug.Log("Snapshot taken");
+            //Debug.Log("Snapshot taken");
             snapPos = transform.position;
             snapRot = zRot;
             snapshotTaken = true;

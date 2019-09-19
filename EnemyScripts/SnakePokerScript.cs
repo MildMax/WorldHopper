@@ -522,12 +522,15 @@ public class SnakePokerScript : EnemyBase
     {
         bool withinDistance = false;
 
-        Vector3 offset = player.position - transform.position;
-        float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
-
-        if (magnitude < dangerClose)
+        if (player != null)
         {
-            withinDistance = true;
+            Vector3 offset = player.position - transform.position;
+            float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
+
+            if (magnitude < dangerClose)
+            {
+                withinDistance = true;
+            }
         }
 
         return withinDistance;

@@ -158,11 +158,33 @@ public class WorldSwitcher : MonoBehaviour {
             }
         }
 
+        AssignKillScript(ref worldColliders);
+
         //Debug.Log("worldColliders[0] length after removal: " + worldColliders[0].Length);
         //Debug.Log("enemyColliders[0] length: " + enemyColliders[0].Length);
 
         //Debug.Log("worldRenderers[0] length after removal: " + worldRenderers[0].Length);
         //Debug.Log("enemyRenderers[0] length: " + enemyRenderers[0].Length);
+    }
+
+    private void AssignKillScript(ref Collider2D[][] colls)
+    {
+        for(int i = 0; i != colls.Length; ++i)
+        {
+            if (colls[i] != null)
+            {
+                for (int j = 0; j != colls[i].Length; ++j)
+                {
+                    PlatformEffector2D pe = colls[i][j].gameObject.GetComponent<PlatformEffector2D>();
+                    CompositeCollider2D cc = colls[i][j].gameObject.GetComponent<CompositeCollider2D>();
+
+                    if (pe == null && cc == null)
+                    {
+                        colls[i][j].gameObject.AddComponent<KillOnLoad>();
+                    }
+                }
+            }
+        }
     }
 
     public void Switcher()

@@ -161,16 +161,19 @@ public class SnailScript : EnemyBase
 
     private void CheckDistance()
     {
-        Vector2 offset = transform.position - playerTransform.position;
-        float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
+        if (playerTransform != null)
+        {
+            Vector2 offset = transform.position - playerTransform.position;
+            float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
 
-        if(magnitude < dangerClose)
-        {
-            withinDistance = true;
-        }
-        else
-        {
-            withinDistance = false;
+            if (magnitude < dangerClose)
+            {
+                withinDistance = true;
+            }
+            else
+            {
+                withinDistance = false;
+            }
         }
     }
 

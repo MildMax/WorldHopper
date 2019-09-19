@@ -17,7 +17,7 @@ public class TriggerEventListener : MonoBehaviour
     private void Awake()
     {
         GameObject[] temp = GameObject.FindGameObjectsWithTag("TriggerEvent");
-        Debug.Log(temp.Length);
+        //Debug.Log(temp.Length);
         for(int i = 0; i != temp.Length; ++i)
         {
             if(temp[i].GetComponent<TriggerEventBase>().channel == channel)

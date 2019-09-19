@@ -35,7 +35,7 @@ static public class ArraySplitter
 
         for(int i = 0; i != l.Length; ++i)
         {
-            Debug.Log((int)char.GetNumericValue(h[i]));
+            //Debug.Log((int)char.GetNumericValue(h[i]));
             l[i] = (int)char.GetNumericValue(h[i]);
         }
 

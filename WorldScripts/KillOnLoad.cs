@@ -63,6 +63,7 @@ public class KillOnLoad : MonoBehaviour {
                 PlayerController p = overlaps.gameObject.GetComponent<PlayerController>();
                 p.boxCollider.enabled = false;
                 p.health = 0;
+                Debug.Log("Killed by " + this.gameObject.transform.parent.name);
             }
             
         }
