@@ -14,7 +14,7 @@ public class KillOnLoad : MonoBehaviour {
     //      to reduce the number of objects that are being called each time the world switches, or just find a less costly
     //      method of checking the players position in relation to the world. Depends on the tests. Lag bad. No want lag.
 
-    bool isEnabled;
+    protected bool isEnabled;
 
     int layer;
 
@@ -25,9 +25,9 @@ public class KillOnLoad : MonoBehaviour {
 
     Vector2 maxVal;
     Vector2 minVal;
-    Vector2 playerDims;
+    protected Vector2 playerDims;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         coll = GetComponent<Collider2D>();
         size = (Vector2)coll.bounds.size;
@@ -36,13 +36,13 @@ public class KillOnLoad : MonoBehaviour {
         CreateInnerBox();
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         DestroyOnColliderEnabled();
         CheckEnabled();
     }
 
-    private void DestroyOnColliderEnabled()
+    protected virtual void DestroyOnColliderEnabled()
     {
         if(coll.isTrigger == false && isEnabled == false)
         {     
@@ -63,13 +63,13 @@ public class KillOnLoad : MonoBehaviour {
                 PlayerController p = overlaps.gameObject.GetComponent<PlayerController>();
                 p.boxCollider.enabled = false;
                 p.health = 0;
-                Debug.Log("Killed by " + this.gameObject.transform.parent.name);
+                //Debug.Log("Killed by " + this.gameObject.transform.parent.name);
             }
             
         }
     }
 
-    private bool CheckPlayerProx(Collider2D o)
+    protected bool CheckPlayerProx(Collider2D o)
     {
         bool isClose = false;
 
@@ -86,7 +86,7 @@ public class KillOnLoad : MonoBehaviour {
         return isClose;
     }
 
-    private void CheckEnabled()
+    protected void CheckEnabled()
     {
         if(isEnabled == false && coll.isTrigger == false)
         {
@@ -98,15 +98,15 @@ public class KillOnLoad : MonoBehaviour {
         }
     }
 
-    private void CreateInnerBox()
+    protected void CreateInnerBox()
     {
         maxVal = new Vector2(
-            coll.transform.position.x + coll.bounds.extents.x - (playerDims.x / 2),
-            coll.transform.position.y + coll.bounds.extents.y - (playerDims.y / 2));
+            coll.transform.position.x + coll.bounds.extents.x - (playerDims.x / 4),
+            coll.transform.position.y + coll.bounds.extents.y - (playerDims.y / 4));
 
         minVal = new Vector2(
-            coll.transform.position.x - coll.bounds.extents.x + (playerDims.x / 2),
-            coll.transform.position.y - coll.bounds.extents.y + (playerDims.y / 2));
+            coll.transform.position.x - coll.bounds.extents.x + (playerDims.x / 4),
+            coll.transform.position.y - coll.bounds.extents.y + (playerDims.y / 4));
     }
 
 }

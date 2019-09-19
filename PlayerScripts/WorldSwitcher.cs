@@ -178,7 +178,11 @@ public class WorldSwitcher : MonoBehaviour {
                     PlatformEffector2D pe = colls[i][j].gameObject.GetComponent<PlatformEffector2D>();
                     CompositeCollider2D cc = colls[i][j].gameObject.GetComponent<CompositeCollider2D>();
 
-                    if (pe == null && cc == null)
+                    if(cc != null)
+                    {
+                        colls[i][j].gameObject.AddComponent<KillOnLoadComposite>();
+                    }
+                    else if (pe == null)
                     {
                         colls[i][j].gameObject.AddComponent<KillOnLoad>();
                     }
