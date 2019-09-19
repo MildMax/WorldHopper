@@ -113,7 +113,7 @@ public class BackgroundScroller : MonoBehaviour
         {
             foreach (SpriteRenderer i in spriteRenderer)
             {
-                i.transform.position = new Vector2(i.transform.position.x, LerpY(playerTransform.position.y, i.transform.position.y, 0.5f));
+                i.transform.position = new Vector2(i.transform.position.x, playerTransform.position.y);
             }
         }
     }
