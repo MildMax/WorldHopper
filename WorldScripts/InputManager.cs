@@ -19,6 +19,7 @@ public class InputManager : MonoBehaviour
     public string previewY = "c_previewY";
     public string useItem = "c_UseItem";
     public string interact = "c_Interact";
+    public string pause = "c_Pause";
 
     private void Update()
     {
@@ -119,6 +120,7 @@ public class InputManager : MonoBehaviour
         previewY = "k_previewY";
         useItem = "k_UseItem";
         interact = "k_Interact";
+        pause = "k_Pause";
 
         keySet = true;
     }
@@ -139,6 +141,7 @@ public class InputManager : MonoBehaviour
         previewY = "c_previewY";
         useItem = "c_UseItem";
         interact = "c_Interact";
+        pause = "c_Pause";
 
         controllerSet = true;
     }
