@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(PokerScript))]
+[CanEditMultipleObjects]
 public class PokerGUI : Editor
 {
     string[] options = { "Continuous", "Timed", "Proximity", "Up" };

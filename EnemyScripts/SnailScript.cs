@@ -7,10 +7,13 @@ public class SnailScript : EnemyBase
     [HideInInspector]
     public int walkIndex;
 
+    [HideInInspector]
+    public int worldNum;
+
     public delegate void WalkMethod();
     WalkMethod walkMethod;
 
-    public int speed;
+    public float speed;
     public float dangerClose;
     public float deathWait;
 
@@ -29,14 +32,23 @@ public class SnailScript : EnemyBase
 
     Point destination;
     int zRot = 0;
-    bool changeTraverse = false;
+    public bool changeTraverse = false;
 
     PlayerController playerController;
     Transform playerTransform;
+    WorldSwitcher wS;
 
     bool withinDistance = false;
     bool isDead = false;
     bool deathRoutine = false;
+
+    [HideInInspector]
+    public string groundLayer;
+
+    [HideInInspector]
+    public string wallLayer;
+
+    float oldHealth;
 
     private void Awake()
     {
@@ -44,17 +56,28 @@ public class SnailScript : EnemyBase
         coll = GetComponent<CapsuleCollider2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         anim = GetComponent<Animator>();
+        groundLayer = "Ground" + (worldNum + 1);
+        wallLayer = "Wall" + (worldNum + 1);
         startHealth = health;
+        oldHealth = health;
+    }
+
+    private void FixedUpdate()
+    {
+        
+        CheckDistance();
     }
 
     // Update is called once per frame
     void Update()
     {
+        HurtForHealth();
         CheckHealth();
         FlipSprites();
         SetWalkMethod();
-        CheckDistance();
+        
         if (withinDistance == false && isDead == false)
         {
             anim.SetBool("IsNear", false);
@@ -138,47 +161,62 @@ public class SnailScript : EnemyBase
 
     private void CheckDistance()
     {
-        Vector2 offset = transform.position - playerTransform.position;
-        float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
+        if (playerTransform != null)
+        {
+            Vector2 offset = transform.position - playerTransform.position;
+            float magnitude = Mathf.Sqrt(Mathf.Pow(offset.x, 2) + Mathf.Pow(offset.y, 2));
 
-        if(magnitude < dangerClose)
-        {
-            withinDistance = true;
+            if (magnitude < dangerClose)
+            {
+                withinDistance = true;
+            }
+            else
+            {
+                withinDistance = false;
+            }
         }
-        else
+    }
+
+    private void HurtForHealth()
+    {
+        if(oldHealth > health)
         {
-            withinDistance = false;
+            anim.SetTrigger("IsHurt");
         }
+
+        oldHealth = health;
     }
 
     private void CheckHealth()
     {
         if(health <= 0)
         {
+            //wS.DestroyEnemyValue(hash);
             isDead = true;
         }
     }
 
     private IEnumerator DeathRoutine()
     {
-        anim.SetBool("IsHurt", true);
+        anim.SetBool("IsDead", true);
         coll.enabled = false;
         deathRoutine = true;
 
         yield return new WaitForSeconds(deathWait);
 
-        anim.SetBool("IsHurt", false);
+        health = startHealth;
+        anim.SetBool("IsDead", false);
         coll.enabled = true;
         isDead = false;
         deathRoutine = false;
-        health = startHealth;
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Player")
         {
-            playerController.GetHurt();
+            playerController.GetHurt(coll.transform.position);
         }
     }
 
@@ -324,7 +362,7 @@ public class SnailScript : EnemyBase
         Quaternion q = Quaternion.AngleAxis(zRot, Vector3.forward);
         Vector2 dir = q * -Vector2.up;
 
-        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(groundLayer));
         //on top of the ground
         if (hit)
         {
@@ -361,7 +399,7 @@ public class SnailScript : EnemyBase
         Quaternion upAffector = Quaternion.AngleAxis(zRot, Vector3.forward);
         Vector2 upDir = upAffector * -Vector2.up;
 
-        RaycastHit2D ground = Physics2D.Raycast(coll.transform.position, upDir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask("Ground"));
+        RaycastHit2D ground = Physics2D.Raycast(coll.transform.position, upDir, (coll.size.y / 2) + 0.5f, LayerMask.GetMask(groundLayer));
 
         float dist = new float();
 
@@ -420,7 +458,7 @@ public class SnailScript : EnemyBase
         Debug.DrawRay(coll.transform.position, dir);
         Debug.DrawRay(coll.transform.position, upDir);
 
-        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, dist + 0.1f, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.Raycast(coll.transform.position, dir, dist + 0.1f, LayerMask.GetMask(groundLayer));
 
         //if shot from transform.position, this collides with the wall it just turned around from, so the offset
         //puts the origin at the front of the sprite depending on direction to avoid this collision with the wall
@@ -437,7 +475,7 @@ public class SnailScript : EnemyBase
         }
 
         Vector2 newPos = new Vector2(coll.transform.position.x + offset, coll.transform.position.y);
-        RaycastHit2D hitWall = Physics2D.Raycast(newPos, dir, dist + 0.1f, LayerMask.GetMask("Wall"));
+        RaycastHit2D hitWall = Physics2D.Raycast(newPos, dir, dist + 0.1f, LayerMask.GetMask(wallLayer));
 
         if(hitWall && !hit)
         {
@@ -573,7 +611,7 @@ public class SnailScript : EnemyBase
 
     private RaycastInfo DoRaycast(Vector2 dir, float dist)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, LayerMask.GetMask(groundLayer));
         //Debug.Log(hit.)
         if (hit)
         {

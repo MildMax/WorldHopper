@@ -21,8 +21,11 @@ public class CameraScript : MonoBehaviour {
     }
 
     private void FixedUpdate()
-    {   
-        transform.position = Vector3.SmoothDamp(transform.position, new Vector3(player.transform.position.x, player.transform.position.y, -offset.z), ref moveVelocity, cameraVelocity * Time.deltaTime);
+    {
+        if (player != null)
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, new Vector3(player.transform.position.x, player.transform.position.y, -offset.z), ref moveVelocity, cameraVelocity * Time.deltaTime);
+        }
     }
 
     /////note:: in fixedupdate previously:::::

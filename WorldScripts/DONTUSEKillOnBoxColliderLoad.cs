@@ -26,7 +26,7 @@ public class KillOnBoxColliderLoad : MonoBehaviour
         {
             if (colliderEnabled == false && colliders[i].isActiveAndEnabled == true)
             {
-                colliderEnabled = true;
+                colliderEnabled = true; 
             }
         }
     }
@@ -55,7 +55,7 @@ public class KillOnBoxColliderLoad : MonoBehaviour
                     Destroy(overlaps.gameObject);
                 }
 
-                Debug.Log("Set to destroy");
+                //Debug.Log("Set to destroy");
             }
         }
     }

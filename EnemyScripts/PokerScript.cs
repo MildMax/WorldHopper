@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PokerScript : EnemyBase
 {
+    public float initialDelay;
+    float initDelayTimer = 0;
 
     //[SerializeField]
     [HideInInspector]
@@ -19,6 +21,12 @@ public class PokerScript : EnemyBase
     //2: PokerUp
     //3: PokerDown
     public AnimationClip[] anims;
+
+    //arrays of sprites for death-flash-sequence in GetDeathStates()
+    public Sprite[] sadSprites;
+    public Sprite[] whiteSprites;
+    Sprite sadSprite;
+    Sprite whiteSprite;
 
     //values for timer-based movement
     public float timer;
@@ -40,28 +48,59 @@ public class PokerScript : EnemyBase
     SpriteRenderer rend;
     Transform player;
     PlayerController playerController;
+    WorldSwitcher wS;
+    CapsuleCollider2D coll;
 
     public AnimatorOverrideController controllerMad;
     public AnimatorOverrideController controllerSad;
+    public AnimatorOverrideController controllerHurt;
+
+    int worldNum;
+
+    float oldHealth;
+    float deathTime;
+    float dTimer = 0;
+    bool deathSet = false;
+
+    bool newStart = false;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         anim.SetBool("IsDown", true); 
         rend = GetComponent<SpriteRenderer>();
+        coll = GetComponent<CapsuleCollider2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         SetActionMethod();
-        actionMethod();
+        if (initialDelay == 0) actionMethod();
+        //actionMethod();
+        worldNum = GetWorldNum();
+        oldHealth = health;
+        deathTime = 0.667f * 3;
         //Debug.Log(actionIndex);
     }
 
     private void Update()
     {
+        RetryGetWorldNum();
+
         CheckHealth();
-        ChangeAnims();
-        SetActionMethod();
-        actionMethod();
+
+        if (deathSet == false && initDelayTimer >= initialDelay)
+        {
+            //HandleCollider();
+            SetActionMethod();
+            actionMethod();
+        }
+        else initDelayTimer += Time.deltaTime;
+    }
+
+    private void LateUpdate()
+    {
+        if (!deathSet) HandleCollider();
+
     }
 
     //:::::::::GENERIC::::::::::://
@@ -95,19 +134,11 @@ public class PokerScript : EnemyBase
         start = false;
         startA = false;
         startD = false;
+        newStart = false;
         anim.SetBool("IsContinuous", false);
-    }
-
-    private void ChangeAnims()
-    {
-        if(isHurt)
-        {
-            anim.runtimeAnimatorController = controllerSad;
-        }
-        else
-        {
-            anim.runtimeAnimatorController = controllerMad;
-        }
+        anim.SetBool("IsUp", false);
+        anim.SetBool("IsDown", true);
+        StopAllCoroutines();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -115,28 +146,34 @@ public class PokerScript : EnemyBase
         if(collision.tag == "Shot")
         {
             health -= collision.gameObject.GetComponent<ShotScript>().damage;
-            if(hurtRoutine != null)
-            {
-                StopCoroutine(hurtRoutine);
-            }
-            hurtRoutine = StartCoroutine(HurtTimer());
+            
         }
     }
 
     private IEnumerator HurtTimer()
     {
-        isHurt = true;
-        yield return new WaitForSeconds(1);
-        isHurt = false;
+        //isHurt = true;
+        //Debug.Log("Running hurt coroutine");
+        anim.runtimeAnimatorController = controllerHurt;
+
+        yield return new WaitForSeconds(0.2f);
+
+        anim.runtimeAnimatorController = controllerSad;
+
+        yield return new WaitForSeconds(0.8f);
+
+        anim.runtimeAnimatorController = controllerMad;
+        //isHurt = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        //Debug.Log(collision.gameObject.name);
         if (collision.gameObject.tag == "Player")
         {
             //Debug.Log("Collision with Player");
 
-            playerController.GetHurt();
+            playerController.GetHurt(transform.position);
         }
     }
 
@@ -144,15 +181,165 @@ public class PokerScript : EnemyBase
     {
         if(health <= 0)
         {
-            Destroy(gameObject);
+            anim.enabled = false;
+            coll.enabled = false;
+
+            if (deathSet == false)
+            {
+                GetDeathStates();
+                actionMethod = null;
+                StopAllCoroutines();
+                StartCoroutine(DeathSequence());
+                deathSet = true;
+            }
+            
+            if (dTimer >= deathTime)
+            {
+                wS.DestroyEnemyValue(hash);
+                Destroy(gameObject);
+            }
+
+            dTimer += Time.deltaTime;
         }
+        else if(oldHealth > health && deathSet == false)
+        {
+            if (hurtRoutine != null)
+            {
+                StopCoroutine(hurtRoutine);
+            }
+            hurtRoutine = StartCoroutine(HurtTimer());
+
+            oldHealth = health;
+        }
+    }
+
+    private IEnumerator DeathSequence()
+    {
+        for(int i = 0; i != 3; ++i)
+        {
+            rend.sprite = whiteSprite;
+            yield return new WaitForSeconds(0.33f);
+            rend.sprite = sadSprite;
+            yield return new WaitForSeconds(0.33f);
+        }
+    }
+
+    private void RetryGetWorldNum()
+    {
+        if(worldNum == 10)
+        {
+            worldNum = GetWorldNum();
+        }
+    }
+
+    private int GetWorldNum()
+    {
+        int num = 10;
+        if (hash != null)
+        {
+            if (hash.Contains("W1"))
+            {
+                num = 0;
+            }
+            else if (hash.Contains("W2"))
+            {
+                num = 1;
+            }
+            else if (hash.Contains("W3"))
+            {
+                num = 2;
+            }
+            else if (hash.Contains("W4"))
+            {
+                num = 3;
+            }
+        }
+        return num;
+        
+    }
+
+    private void HandleCollider()
+    {
+        if(anim.GetBool("IsDown") == true || wS.activeWorldNum != worldNum)
+        {
+            if (coll.enabled == true)
+            {
+                coll.enabled = false;
+            }
+        }
+        else if(coll.enabled == false)
+        {
+            coll.enabled = true;
+        }
+    }
+
+    private void GetDeathStates()
+    {
+        Sprite c = rend.sprite;
+        //Debug.Log(c.name);
+
+        string num = null;
+
+        for(int i = 0; i != c.name.Length; ++i)
+        {
+            //Debug.Log(c.name[i] + " : " + (int)char.GetNumericValue(c.name[i]));
+            int temp = (int)char.GetNumericValue(c.name[i]);
+
+            if (temp != -1)
+            {
+                num += temp.ToString();
+            }
+        }
+
+        //Debug.Log(num);
+
+        if (num != null)
+        {
+            for (int i = 0; i != whiteSprites.Length; ++i)
+            {
+                if (whiteSprites[i].name.Contains(num))
+                {
+                    whiteSprite = whiteSprites[i];
+                    break;
+                }
+            }   
+        }
+        else
+        {
+            whiteSprite = whiteSprites[0];
+        }
+
+        if (num != null)
+        {
+            for (int i = 0; i != sadSprites.Length; ++i)
+            {
+                if (sadSprites[i].name.Contains(num))
+                {
+                    sadSprite = sadSprites[i];
+                    break;
+                }
+            }
+        }
+        else
+        {
+            sadSprite = sadSprites[0]; 
+        }
+
+        //Debug.Log(whiteSprite.name);
+        //Debug.Log(sadSprite.name);
+
     }
 
     //::::::::::::CONTINOUS::::::::://
     private void Continuous()
     {
-        anim.SetBool("IsDown", false);
-        anim.SetBool("IsContinuous", true);
+        if (newStart == false)
+        {
+            anim.SetBool("IsDown", false);
+            anim.SetBool("IsContinuous", true);
+            newStart = true;
+        }
+
         if (!start)
         {
             StartCoroutine(ContinousAnimation());
@@ -176,7 +363,11 @@ public class PokerScript : EnemyBase
     //:::::::::::TIMED::::::::::::://
     private void Timed()
     {
-        anim.SetBool("IsDown", false);
+        if (newStart == false)
+        {
+            anim.SetBool("IsDown", false);
+            newStart = true;
+        }
         if(start == false)
         {
             StartCoroutine(TimedAnimation());

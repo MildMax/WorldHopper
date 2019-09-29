@@ -12,13 +12,15 @@ public class ThrowBomb : MonoBehaviour {
     bool buttonPressed = false;
     Transform[] throwPoints;
     PlayerController playerController;
+    BombCounterScript counterScript;
 
     private void Awake()
     {
         //itemSwitcher = GetComponentInParent<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInParent<ItemSwitcherAlt>();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
         playerController = GetComponentInParent<PlayerController>();
+        counterScript = GameObject.FindGameObjectWithTag("BombCanvas").GetComponentInChildren<BombCounterScript>();
         throwPoints = GetThrowPoints();
     }
 
@@ -34,7 +36,7 @@ public class ThrowBomb : MonoBehaviour {
 
     public void GetButtonPress()
     {
-        if(itemSwitcherAlt.itemIndex == 3 && Input.GetButtonDown(IM.useItem))
+        if(itemSwitcherAlt.itemIndex == 3 && Input.GetButtonDown(IM.useItem) && counterScript.canThrow == true)
         {
             buttonPressed = true;
         }
@@ -53,6 +55,7 @@ public class ThrowBomb : MonoBehaviour {
                 Instantiate(bomb, throwPoints[1].position, Quaternion.identity);
             }
             //Instantiate(bomb, transform.position, Quaternion.identity);
+            counterScript.bombCount -= 1;
             buttonPressed = false;
         }
     }

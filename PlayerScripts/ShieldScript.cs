@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class ShieldScript : MonoBehaviour {
 
-    ItemSwitcher itemSwitcher;
-    BoxCollider2D boxCollider;
+    ItemSwitcherAlt itemSwitcherAlt;
+    BoxCollider2D[] boxCollider = new BoxCollider2D[2];
+    PlayerController playerController;
 
     private void Awake()
     {
-        itemSwitcher = GetComponentInParent<ItemSwitcher>();
-        boxCollider = GetComponent<BoxCollider2D>();
+        itemSwitcherAlt = GetComponentInParent<ItemSwitcherAlt>();
+        boxCollider = GetComponentsInChildren<BoxCollider2D>();
+        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        //Debug.Log(playerController == null);
     }
 
     //private void Update()
@@ -20,25 +23,25 @@ public class ShieldScript : MonoBehaviour {
 
     public void EnableShield()
     {
-        if(itemSwitcher.itemIndex == 4)
+        //Debug.Log("enable shield being called");
+        if (itemSwitcherAlt.itemIndex == 4 && playerController.direction > 0)
         {
-            boxCollider.enabled = true;
+            //Debug.Log("Enabling shield right");
+            boxCollider[1].enabled = false;
+            boxCollider[0].enabled = true; 
+        }
+        else if(itemSwitcherAlt.itemIndex == 4 && playerController.direction < 0)
+        {
+            //Debug.Log("Enabling shield left");
+            boxCollider[0].enabled = false;
+            boxCollider[1].enabled = true;
         }
         else
         {
-            boxCollider.enabled = false;
+            for(int i = 0; i != boxCollider.Length; ++i)
+            {
+                boxCollider[i].enabled = false;
+            }
         }
     }
-
-    //private void FlipCollider()
-    //{
-    //    if(playerController.direction > 0)
-    //    {
-    //        boxCollider.transform.position = new Vector2(transform.position.x + offset, transform.position.y);
-    //    }
-    //    else if(playerController.direction < 0)
-    //    {
-    //        boxCollider.transform.position = new Vector2(transform.position.x - offset, transform.position.y);
-    //    }
-    //}
 }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    bool keySet = false;
-    bool controllerSet = true;
+    public bool keySet = false;
+    public bool controllerSet = true;
 
     public string jump = "c_Jump";
     public string dash = "c_Dash";
@@ -18,21 +18,24 @@ public class InputManager : MonoBehaviour
     public string previewX = "c_previewX";
     public string previewY = "c_previewY";
     public string useItem = "c_UseItem";
+    public string interact = "c_Interact";
+    public string pause = "c_Pause";
 
     private void Update()
     {
-        if(controllerSet && SwitchKeyboard())
-        {
-            //Debug.Log("Controller setting");
-            controllerSet = false;
-            SetKeyboard();
-        }
-        else if(keySet && SwitchController())
+        if (keySet && SwitchController())
         {
             //Debug.Log("keyboard setting");
             keySet = false;
             SetController();
         }
+        else if (controllerSet && SwitchKeyboard())
+        {
+            //Debug.Log("Controller setting");
+            controllerSet = false;
+            SetKeyboard();
+        }
+        
     }
 
     private bool SwitchKeyboard()
@@ -41,7 +44,15 @@ public class InputManager : MonoBehaviour
 
         bool isKey = false;
 
-        if(Input.anyKey)
+        if (Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.Space) ||
+            Input.GetMouseButton(0) ||
+            Input.GetMouseButton(1) ||
+            Input.GetMouseButton(2) ||
+            Input.GetKey(KeyCode.LeftControl))
         {
             isKey = true;
         }
@@ -90,7 +101,7 @@ public class InputManager : MonoBehaviour
             isController = true;
         }
 
-            return isController;
+        return isController;
     }
 
     private void SetKeyboard()
@@ -108,8 +119,10 @@ public class InputManager : MonoBehaviour
         previewX = "k_previewX";
         previewY = "k_previewY";
         useItem = "k_UseItem";
+        interact = "k_Interact";
+        pause = "k_Pause";
 
-    keySet = true;
+        keySet = true;
     }
 
     private void SetController()
@@ -127,6 +140,8 @@ public class InputManager : MonoBehaviour
         previewX = "c_previewX";
         previewY = "c_previewY";
         useItem = "c_UseItem";
+        interact = "c_Interact";
+        pause = "c_Pause";
 
         controllerSet = true;
     }

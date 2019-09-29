@@ -14,26 +14,99 @@ public class KillOnLoad : MonoBehaviour {
     //      to reduce the number of objects that are being called each time the world switches, or just find a less costly
     //      method of checking the players position in relation to the world. Depends on the tests. Lag bad. No want lag.
 
-    Transform[] worldBoxPos;
-    Vector2 size = new Vector2(0.7f, 0.7f);
+    protected bool isEnabled;
 
-    private void Awake()
+    int layer;
+
+    Transform[] worldBoxPos;
+    Transform pos;
+    Vector2 size;
+    Collider2D coll;
+
+    Vector2 maxVal;
+    Vector2 minVal;
+    protected Vector2 playerDims;
+
+    protected virtual void Awake()
     {
-        worldBoxPos = GetComponentsInChildren<Transform>();
+        coll = GetComponent<Collider2D>();
+        size = (Vector2)coll.bounds.size;
+        playerDims = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>().size;
+        pos = coll.transform;
+        CreateInnerBox();
     }
 
-    private void OnEnable()
+    protected virtual void FixedUpdate()
     {
+        DestroyOnColliderEnabled();
+        CheckEnabled();
+    }
 
-        foreach (Transform i in worldBoxPos)
-        {
-            Collider2D overlaps = Physics2D.OverlapBox(i.position, size, 0f, LayerMask.GetMask("Default"));
+    protected virtual void DestroyOnColliderEnabled()
+    {
+        if(coll.isTrigger == false && isEnabled == false)
+        {     
+            Collider2D overlaps = Physics2D.OverlapBox(pos.position, size, 0f, LayerMask.GetMask("Player"));
 
-            if (overlaps != null && overlaps.name == "Player")
+            //Debug.Log(overlaps == null);
+            //Debug.Log(overlaps.name);
+
+            bool isClose = false;
+
+            if (overlaps != null)
             {
-                Destroy(overlaps.gameObject);
+                isClose = CheckPlayerProx(overlaps);
             }
+
+            if (overlaps != null && overlaps.name == "Player" && isClose == true)
+            {
+                PlayerController p = overlaps.gameObject.GetComponent<PlayerController>();
+                p.boxCollider.enabled = false;
+                p.health = 0;
+                //Debug.Log("Killed by " + this.gameObject.transform.parent.name);
+            }
+            
         }
+    }
+
+    protected bool CheckPlayerProx(Collider2D o)
+    {
+        bool isClose = false;
+
+        if(
+            o.transform.position.x < maxVal.x &&
+            o.transform.position.x > minVal.x &&
+            o.transform.position.y < maxVal.y &&
+            o.transform.position.y > minVal.y
+            )
+        {
+            isClose = true;
+        }
+
+        return isClose;
+    }
+
+    protected void CheckEnabled()
+    {
+        if(isEnabled == false && coll.isTrigger == false)
+        {
+            isEnabled = true;
+        }
+        else if(isEnabled == true && coll.isTrigger == true)
+        {
+            isEnabled = false;
+        }
+    }
+
+    protected void CreateInnerBox()
+    {
+        maxVal = new Vector2(
+            coll.transform.position.x + coll.bounds.extents.x - (playerDims.x / 4),
+            coll.transform.position.y + coll.bounds.extents.y - (playerDims.y / 4));
+
+        minVal = new Vector2(
+            coll.transform.position.x - coll.bounds.extents.x + (playerDims.x / 4),
+            coll.transform.position.y - coll.bounds.extents.y + (playerDims.y / 4));
     }
 
 }

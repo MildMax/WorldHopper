@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    //pull and interact with HealthHUDScript
+    //FOR TIME BEING -- CANNOT BE GREATER THAN 6
+    public int health = 6;
+
+    public float invulTime;
+    float invulTimer = 0;
+    bool isInvul = false;
+
     //used for debugging purposes
     //set in Update() method
     //public Vector2 bodyVelocity;
@@ -15,7 +23,7 @@ public class PlayerController : MonoBehaviour {
 
     //velocity added during double jump
     //used in Jump() function
-    public float doubleJumpVelocity;
+    public float jumpVelocity;
 
     //Set in CheckIfGrounded() function
     //used to enable jumping in PerformKeyPresses() function
@@ -119,7 +127,8 @@ public class PlayerController : MonoBehaviour {
 
     //used in CheckIfGrounded() function for position and height of raycast
     //used in CheckDistanceToGround() function for "" "" "" "" ""
-    CapsuleCollider2D capsuleCollider;
+    [HideInInspector]
+    public BoxCollider2D boxCollider;
 
     //taken from child object Items
     //used in DeployUmbrella()
@@ -144,21 +153,58 @@ public class PlayerController : MonoBehaviour {
     bool waterVel = false;
 
     bool waterSpeed = false;
+    bool belowEnemy = false;
 
     InputManager IM;
+
+    WorldSwitcher worldSwitcher;
+
+    Vector3 halfCollSizeX;
+    Vector3 halfCollSizeY;
+
+    SpriteRenderer rend;
+    Color white = Color.white;
+    Color fade = new Color(1, 1, 1, 0.75f);
+
+    float deathTime;
+    float deathSwitch;
+    float deathTimer = 0;
+    float switchTimer = 0;
+    bool deathSet = false;
+    [HideInInspector]
+    public bool isDead = false;
+
+    float waterDownVelocity = -2;
+    float downVelocity = -10;
+
+    [HideInInspector]
+    public bool isInteract = false;
+
+    public bool onPlatform = false;
+    public bool isInPlatform = false;
+
+    public float fallAcceleration;
+
+    [HideInInspector]
+    public bool isSprung = false;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        capsuleCollider = GetComponent<CapsuleCollider2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         //itemSwitcher = GetComponentInChildren<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
         playerAnimScript = GetComponent<PlayerAnimationScript>();
+        rend = GetComponent<SpriteRenderer>();
         previousDirection = transform.position.x;
         direction = awakeDirection;
-        IM = GetComponent<InputManager>();
-
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
+        worldSwitcher = GetComponentInChildren<WorldSwitcher>();
+        halfCollSizeX = new Vector3((boxCollider.size.x / 2) - (boxCollider.size.x / 10), 0f, 0f);
+        halfCollSizeY = new Vector3(0f, boxCollider.size.y / 2, 0f);
         offset = transform.position.x - previousDirection;
+        deathTime = 2;
+        deathSwitch = deathTime / 6;
     }
 
     //private void FixedUpdate()
@@ -197,13 +243,23 @@ public class PlayerController : MonoBehaviour {
             //PerformKeyPresses();
             UmbrellaDeployed();
         }
-        else if (isHurt == true && inWater == false)
+        else if (isHurt == true && inWater == false && belowEnemy == false)
         {
             //Debug.Log("get hurt");
             KillDashOnHurt();
             body.velocity = Vector2.zero;
             body.AddForce(new Vector2(-direction * hurtForce, yHurtForce));
             StartCoroutine(CheckHurtHeight(body.position.x, body.position.y));
+            isHurt = false;
+        }
+        else if (isHurt == true && inWater == false && belowEnemy == true)
+        {
+            //Debug.Log("get hurt");
+            KillDashOnHurt();
+            body.velocity = Vector2.zero;
+            body.AddForce(new Vector2(-direction * hurtForce, yHurtForce));
+            StartCoroutine(BelowHurtTime());
+            belowEnemy = false;
             isHurt = false;
         }
         else if(isHurt == true && inWater == true)
@@ -220,6 +276,41 @@ public class PlayerController : MonoBehaviour {
         CheckDistanceToGround();
         CheckFreeFall();
 
+    }
+
+    public void CheckHealth()
+    {
+        if(health > 6)
+        {
+            health = 6;
+        }
+        else if(health <= 0)
+        {
+            if(deathSet == false)
+            {
+                isDead = true;
+                boxCollider.enabled = false;
+                rend.color = white;
+                rend.enabled = false;
+                body.constraints = RigidbodyConstraints2D.FreezeAll;
+                deathSet = true;
+            }
+
+            if(switchTimer >= deathSwitch)
+            {
+                rend.enabled = !rend.enabled;
+                switchTimer = 0;
+            }
+
+            if(deathTimer >= deathTime)
+            {
+                Destroy(gameObject);
+            }
+
+            switchTimer += Time.deltaTime;
+            deathTimer += Time.deltaTime;
+            //destroy game object
+        }
     }
 
     private IEnumerator CheckHurtHeight(float x, float y)
@@ -239,11 +330,18 @@ public class PlayerController : MonoBehaviour {
         playerAnimScript.hurt = false;
     }
 
+    private IEnumerator BelowHurtTime()
+    {
+        yield return new WaitForSeconds(0.5f);
+        playerAnimScript.hurt = false;
+    }
+
     //pretty straight forward
     //called in Update() method
     public void PerformKeyPresses()
     {
         Move();
+        HoldDown();
 
         if ((grounded || doubleJump == false) && jumpDown == true)
         {
@@ -260,38 +358,90 @@ public class PlayerController : MonoBehaviour {
     //sets bool grounded to true if raycast returns a hit
     public void CheckIfGrounded()
     {
-        if (groundedFrames >= 1)
-        {
-            ground = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, (capsuleCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground"));
+        //Debug.Log("Ground" + (worldSwitcher.activeWorldNum + 1));
 
-            //Debug.DrawLine(capsuleCollider.transform.position, capsuleCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(capsuleCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
+        Vector3 leftPos = boxCollider.transform.position - halfCollSizeX - halfCollSizeY;                
+        RaycastHit2D left = Physics2D.Raycast(leftPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
+        Vector3 rightPos = boxCollider.transform.position + halfCollSizeX - halfCollSizeY;
+        RaycastHit2D right = Physics2D.Raycast(rightPos, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        RaycastHit2D mid = Physics2D.Raycast(boxCollider.transform.position - halfCollSizeY, -Vector2.up, 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+        Debug.DrawRay(leftPos, -Vector2.up);
+        Debug.DrawRay(rightPos, -Vector2.up);
+        Debug.DrawRay(boxCollider.transform.position - halfCollSizeY, -Vector2.up);
+
+        //ground = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, (boxCollider.size.y / 2) + 0.1f, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
+
+<<<<<<< HEAD
             if (ground && ground.collider.gameObject.tag != "CollInactive")
+=======
+        //Debug.DrawLine(boxCollider.transform.position, boxCollider.transform.position - new Vector3(0f, Mathf.Sqrt(Mathf.Pow(boxCollider.size.y / 2, 2) * 2) + 0.1f, 0f), Color.red);
+
+        if (mid || left || right)
+        {
+            if(mid)
+>>>>>>> not-developed
+            {
+                //Debug.Log("Mid set");
+                ground = mid;
+            }
+            else if(left)
+            {
+                //Debug.Log("Left set");
+                ground = left;
+            }
+            else if(right)
+            {
+                //Debug.Log("Right set");
+                ground = right;
+            }
+
+            if(ground.collider.gameObject.tag == "Platform")
+            {
+                onPlatform = true;
+            }
+            else
+            {
+                onPlatform = false;
+            }
+
+            if(body.velocity.y <= 0)
             {
                 grounded = true;
                 doubleJump = false;
                 airDash = false;
-                //runAtTimeOfJump = false;
             }
-            else
-            {
-                grounded = false;
-            }
-
-            groundedFrames = 0;
+        }
+        else
+        {
+            grounded = false;
+            onPlatform = false;
         }
         
+        if(isInPlatform)
+        {
+            grounded = false;
+            onPlatform = false;
+        }
     }
 
     //Checks what keys are being pressed
     public void CheckKeyInput()
     {
         //jump key
-        if (Input.GetButtonDown(IM.jump))
+        if(Input.GetButtonDown(IM.jump) && Input.GetAxisRaw(IM.vertical) < 0 && onPlatform == true)
+        {
+            ground.collider.gameObject.GetComponent<PlatformColliderScript>().MakeTrigger();
+            isInPlatform = true;
+            Debug.Log("Dropping through platform");
+        }
+        else if (Input.GetButtonDown(IM.jump))
         {
             StartCoroutine(HasJumped());
             jumpDown = true;
-            //Debug.Log("Jump key pressed");
+            Debug.Log("Jump key pressed");
         }
         else
         {
@@ -329,8 +479,10 @@ public class PlayerController : MonoBehaviour {
             {
                 doubleJump = true;
                 //body.velocity = new Vector2(body.velocity.x, doubleJumpVelocity);
+                //Debug.Log(body.velocity.y);
                 body.velocity = new Vector2(body.velocity.x, 0);
-                body.AddForce(new Vector2(body.velocity.x, doubleJumpVelocity));
+                //Debug.Log(body.velocity.y);
+                body.AddForce(new Vector2(body.velocity.x, jumpVelocity));
             }
             else
             {
@@ -342,7 +494,7 @@ public class PlayerController : MonoBehaviour {
                 }
 
                 //body.velocity = new Vector2(body.velocity.x, doubleJumpVelocity);
-                body.AddForce(new Vector2(body.velocity.x, doubleJumpVelocity));
+                body.AddForce(new Vector2(body.velocity.x, jumpVelocity));
 
             }
         }
@@ -399,17 +551,36 @@ public class PlayerController : MonoBehaviour {
         }       
     }
 
+    private void HoldDown()
+    {
+        if(!grounded && !isDashing && Input.GetAxisRaw(IM.vertical) < 0)
+        {
+            if(inWater && body.velocity.y > -2)
+            {
+                body.velocity = new Vector2(body.velocity.x, waterDownVelocity);
+            }
+            else if(body.velocity.y > downVelocity)
+            {
+                //Debug.Log("Holding down down");
+
+                body.velocity = new Vector2(body.velocity.x, Mathf.Lerp(body.velocity.y, downVelocity, (body.velocity.y - downVelocity) * fallAcceleration * Time.deltaTime));
+            }
+            else if(body.velocity.y <= downVelocity)
+            { body.velocity = new Vector2(body.velocity.x, downVelocity); }
+        }
+    }
+
     //If player is in the air, checks the distance from the character to the ground, and starts Coroutine when it is close to the ground
     //used to prevent colliders from overlapping
     public void CheckDistanceToGround()
     {
         if (!grounded)
         {
-            RaycastHit2D distanceToGround = Physics2D.Raycast(capsuleCollider.transform.position, -Vector2.up, capsuleCollider.size.y, LayerMask.GetMask("Ground"));
+            RaycastHit2D distanceToGround = Physics2D.Raycast(boxCollider.transform.position, -Vector2.up, boxCollider.size.y, LayerMask.GetMask("Ground" + (worldSwitcher.activeWorldNum + 1)));
 
-            //Debug.DrawRay(transform.position, -Vector2.up * capsuleCollider.size.y, Color.red, 5.0f);
+            //Debug.DrawRay(transform.position, -Vector2.up * boxCollider.size.y, Color.red, 5.0f);
 
-            if (distanceToGround && distanceToGround.distance < capsuleCollider.size.y / 2 + 0.5f && body.velocity.y < 0)
+            if (distanceToGround && distanceToGround.distance < boxCollider.size.y / 2 + 0.5f && body.velocity.y < 0)
             {
                 StartCoroutine(CollisionDetectionWait());
             }
@@ -451,7 +622,7 @@ public class PlayerController : MonoBehaviour {
         body.velocity = Vector2.zero;
         body.velocity = new Vector2(direction * dashVelocity, 0f);
 
-        fG = StartCoroutine(FuckGravity());
+        fG = StartCoroutine(NoGravity());
 
         yield return new WaitForSeconds(0.2f);
 
@@ -473,7 +644,7 @@ public class PlayerController : MonoBehaviour {
 
     //prevents player from dropping while dashing in the air
     //called and terminated in EnactDash() method
-    private IEnumerator FuckGravity()
+    private IEnumerator NoGravity()
     {
         bool placeHolder = true;
         while (placeHolder)
@@ -487,7 +658,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (dashRoutine != null && playerAnimScript.hurt == true)
         {
-            Debug.Log("Killing coroutine");
+            //Debug.Log("Killing coroutine");
             StopCoroutine(dashRoutine);
             StopCoroutine(fG);
             noDashJump = false;
@@ -502,7 +673,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (grounded && hasJumped == false && playerAnimScript.hurt == false)
         {
-            transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (capsuleCollider.size.y / 2));
+            //transform.position = new Vector2(transform.position.x, ground.transform.position.y + (ground.collider.bounds.size.y / 2) + (boxCollider.size.y / 2));
         }
     }
 
@@ -596,12 +767,12 @@ public class PlayerController : MonoBehaviour {
 
         if (inWater == true && waterVel == false)
         {
-            doubleJumpVelocity /= 2.5f;
+            jumpVelocity /= 2.5f;
             waterVel = true;
         }
         else if(inWater == false && waterVel == true)
         {
-            doubleJumpVelocity *= 2.5f;
+            jumpVelocity *= 2.5f;
             waterVel = false;
         }
 
@@ -622,10 +793,62 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void GetHurt()
+    public void GetHurt(Vector2 pos)
     {
-        isHurt = true;
-        playerAnimScript.hurt = true;
+        if (!isInvul)
+        {
+            isHurt = true;
+            playerAnimScript.hurt = true;
+            isInvul = true;
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), true);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("EnemyB"), true);
+
+            health -= 1;
+            rend.color = fade;
+
+            if (transform.position.y < pos.y)
+            {
+                belowEnemy = true;
+            }
+        }
     }
 
+    public void InvulnerableOnHurt()
+    {
+        if(isInvul)
+        {
+            invulTimer += Time.deltaTime;
+
+            if(invulTimer >= invulTime)
+            {
+                rend.color = white;
+                isInvul = false;
+                invulTimer = 0;
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("EnemyB"), false);
+            }
+        }
+    }
+
+    public void DetectInteract()
+    {
+        if (Input.GetButtonDown(IM.interact) && playerAnimScript.hurt == false) isInteract = true;
+        else isInteract = false;
+    }
+
+    public void CheckSpringKinematic()
+    {
+        if (isSprung) body.isKinematic = true;
+        else body.isKinematic = false;
+    }
+
+    public void MakeKinematic()
+    {
+        body.isKinematic = true;
+    }
+
+    public void MakeDynamic()
+    {
+        body.isKinematic = false;
+    }
 }

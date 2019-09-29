@@ -12,19 +12,40 @@ public class BombScript : MonoBehaviour {
     SpriteRenderer spriteRenderer;
     BoxCollider2D boxCollider;
     PlayerController playerController;
+    WorldSwitcher worldSwitcher;
+    GameObject player;
 
-    int hitTimer = 0;
+    public float waitTime;
+    public float durationWait = 3;
+
+    float hitTimer = 0;
     float durationTimer = 0;
     bool bodyFrozen = false;
+    int worldNum;
+    int oldWorldNum;
+    bool initialSet = false;
+
+    //contact filter stuff
+    int g1;
+    int g2;
+    int g3;
+    int g4;
+    int finalMask;
+    int currMask;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         boxCollider = GetComponent<BoxCollider2D>();
-        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        playerBody = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-        IgnoreLayerCollisions();
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerController = player.GetComponent<PlayerController>();
+        playerBody = player.GetComponent<Rigidbody2D>();
+        worldSwitcher = player.GetComponentInChildren<WorldSwitcher>();
+        worldNum = worldSwitcher.activeWorldNum;
+        oldWorldNum = worldNum;
+        SetLayerMasks();
+        FindCurrentLayerMask();
         //Debug.Log(playerBody.velocity.x + " " + playerBody.velocity.y);
 
         if (playerController.direction > 0)
@@ -38,16 +59,21 @@ public class BombScript : MonoBehaviour {
             body.velocity = new Vector2(-bombVelocity.x, bombVelocity.y) + (playerBody.velocity / 1.5f);
         }
 
-        Debug.Log(body.velocity.x + " " + body.velocity.y);
+        //Debug.Log(body.velocity.x + " " + body.velocity.y);
         StartCoroutine(FlashBomb());
     }
 
     private void Update()
     {
 
-        RaycastHit2D hit = Physics2D.Raycast(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - Mathf.Abs(boxCollider.size.y / 2 + 0.051f), boxCollider.transform.position.z),
-            Vector2.down, 0.075f, LayerMask.GetMask("Ground"));
+        FindCurrentLayerMask();
 
+        RaycastHit2D hit = Physics2D.Raycast(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - (boxCollider.size.y / 2), boxCollider.transform.position.z),
+            Vector2.down, 0.075f, currMask);
+
+        //Debug.DrawRay(new Vector3(boxCollider.transform.position.x, boxCollider.transform.position.y - (boxCollider.size.y / 2), boxCollider.transform.position.z), Vector2.down);
+
+        //if (hit) { Debug.Log("bomb Hit"); }
 
         if (!hit)
         {
@@ -55,17 +81,27 @@ public class BombScript : MonoBehaviour {
         }
         else
         {
-            hitTimer += 1;
+            hitTimer += Time.deltaTime;
         }
 
-        if (hitTimer >= 35 && bodyFrozen == false)
+        if (hitTimer >= waitTime && bodyFrozen == false)
         {
             body.constraints = RigidbodyConstraints2D.FreezeAll;
             bodyFrozen = true;
         }
+
+        if (worldSwitcher.activeWorldNum != worldNum)
+        {
+            //Debug.Log("Unfreezing constraints");
+            body.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
+            body.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
+            worldNum = worldSwitcher.activeWorldNum;
+            hitTimer = 0;
+            bodyFrozen = false;
+        }
         durationTimer += Time.deltaTime;
 
-        if(durationTimer >= 3)
+        if(durationTimer >= durationWait)
         {
             ExplosionDamage();
             Destroy(gameObject);
@@ -98,7 +134,11 @@ public class BombScript : MonoBehaviour {
     {
         Collider2D[] results = new Collider2D[10];
         ContactFilter2D cf = new ContactFilter2D();
-        cf.SetLayerMask(LayerMask.GetMask("Enemy"));
+
+        int a = 1 << LayerMask.NameToLayer("Enemy");
+        int b = 1 << LayerMask.NameToLayer("EnemyB");
+        int m = a | b;
+        cf.SetLayerMask(m);
         Physics2D.OverlapCircle(transform.position, 1f, cf, results);
 
         for(int i = 0; i != results.Length; ++i)
@@ -118,9 +158,45 @@ public class BombScript : MonoBehaviour {
         }
     }
 
-    private void IgnoreLayerCollisions()
+    private void SetLayerMasks()
     {
-        Physics2D.IgnoreLayerCollision(gameObject.layer, 11);
+        g1 = 1 << LayerMask.NameToLayer("Ground1");
+        g2 = 1 << LayerMask.NameToLayer("Ground2");
+        g3 = 1 << LayerMask.NameToLayer("Ground3");
+        g4 = 1 << LayerMask.NameToLayer("Ground4");
+        finalMask = g1 | g2 | g3 | g4;
 
+        //Debug.Log(g1);
+        //Debug.Log(g2);
+        //Debug.Log(g3);
+        //Debug.Log(g4);
+    }
+
+    private void FindCurrentLayerMask()
+    {
+        if (oldWorldNum != worldSwitcher.activeWorldNum || initialSet == false)
+        {
+            initialSet = true;
+
+            switch (worldSwitcher.activeWorldNum)
+            {
+                case 0:
+                    currMask = g1;
+                    break;
+                case 1:
+                    currMask = g2;
+                    break;
+                case 2:
+                    currMask = g3;
+                    break;
+                case 3:
+                    currMask = g4;
+                    break;
+                default:
+                    currMask = finalMask;
+                    break;
+            }
+            oldWorldNum = worldSwitcher.activeWorldNum;
+        }
     }
 }

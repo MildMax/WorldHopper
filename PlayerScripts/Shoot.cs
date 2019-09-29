@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shoot : MonoBehaviour {
 
     public GameObject shot;
+    public float energyCost;
 
     //ItemSwitcher itemSwitcher;
     ItemSwitcherAlt itemSwitcherAlt;
@@ -14,6 +15,7 @@ public class Shoot : MonoBehaviour {
     InputManager IM;
     bool isShoot = false;
     Transform[] shootPoints;
+    RaygunEnergyScript energyScript;
 
     //bool isLeft = false;
 
@@ -29,7 +31,8 @@ public class Shoot : MonoBehaviour {
         itemSwitcherAlt = GetComponentInParent<ItemSwitcherAlt>();
         playerController = GetComponentInParent<PlayerController>();
         parentTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
-        IM = GetComponentInParent<InputManager>();
+        IM = GameObject.FindGameObjectWithTag("GameController").GetComponent<InputManager>();
+        energyScript = GameObject.FindGameObjectWithTag("EnergySlider").GetComponent<RaygunEnergyScript>();
         shootPoints = GetShootPoints();
     }
 
@@ -52,7 +55,7 @@ public class Shoot : MonoBehaviour {
 
     public void GetButtonPress()
     {
-        if (Input.GetButtonDown(IM.useItem) && itemSwitcherAlt.itemIndex == 2 && isShoot == false)
+        if (Input.GetButtonDown(IM.useItem) && itemSwitcherAlt.itemIndex == 2 && isShoot == false && energyScript.cantShoot == false)
         {
             isShoot = true;
         }
@@ -97,6 +100,7 @@ public class Shoot : MonoBehaviour {
                 Instantiate(shot, shootPoints[3].position, Quaternion.identity);
             }
             //Instantiate(shot, transform.position, Quaternion.identity);
+            energyScript.slider.value -= energyCost;
             isShoot = false;
         }
     }

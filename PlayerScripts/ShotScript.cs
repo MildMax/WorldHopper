@@ -11,13 +11,15 @@ public class ShotScript : MonoBehaviour {
 
     Rigidbody2D body;
     PlayerController playerController;
+    WorldSwitcher wS;
 
-    string[] tags = { "Boundary", "Player", "PlayerChild", "Shot", "WaterCollider" };
+    string[] tags = { "Player", "PlayerChild", "Shot", "WaterCollider" };
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        wS = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
         if (playerController.direction > 0)
         {
             body.velocity = transform.right * speed;
@@ -40,17 +42,33 @@ public class ShotScript : MonoBehaviour {
 
     private bool CheckObject(Collider2D coll)
     {
-        bool val = true;
+        bool val = false;
 
-        for(int i = 0; i != tags.Length; ++i)
+        //Debug.Log(coll.gameObject.layer.ToString() + " : " + LayerMask.NameToLayer("Ground" + (wS.activeWorldNum + 1)));
+
+        if (coll.gameObject.layer == LayerMask.NameToLayer("Ground" + (wS.activeWorldNum + 1)))
         {
-            if(coll.tag == tags[i])
-            {
-                val = false;
-            }
+            val = true;
+        }
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("Wall" + (wS.activeWorldNum + 1)))
+        {
+            val = true;
+        }
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("Enemy") && coll.gameObject.tag != "Detector")
+        {
+            val = true;
+        }
+        else if (coll.gameObject.layer == LayerMask.NameToLayer("EnemyB"))
+        {
+            val = true;
         }
 
-        if(coll.gameObject.layer == LayerMask.GetMask("Water") >> 2)
+        //special case
+        if(coll.gameObject.tag == "WaterCollider")
+        {
+            val = false;
+        }
+        else if(coll.gameObject.tag == "Ghost")
         {
             val = false;
         }

@@ -9,9 +9,13 @@ public class SlimeGUI : Editor
     string[] options = new string[] { "Auto", "Point" };
     SerializedProperty walkIndex;
 
+    string[] worldOptions = { "1", "2", "3", "4" };
+    SerializedProperty worldNum;
+
     private void OnEnable()
     {
         walkIndex = serializedObject.FindProperty("walkIndex");
+        worldNum = serializedObject.FindProperty("worldNum");
     }
 
     public override void OnInspectorGUI()
@@ -23,6 +27,13 @@ public class SlimeGUI : Editor
 
             GUILayout.Label("Walk Type: ", GUILayout.Width(70));
             walkIndex.intValue = EditorGUILayout.Popup(walkIndex.intValue, options, GUILayout.Width(100));
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("World Number:", GUILayout.Width(70));
+        worldNum.intValue = EditorGUILayout.Popup(worldNum.intValue, worldOptions, GUILayout.Width(100));
 
         GUILayout.EndHorizontal();
 
