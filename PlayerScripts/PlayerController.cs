@@ -128,7 +128,7 @@ public class PlayerController : MonoBehaviour {
     //used in CheckIfGrounded() function for position and height of raycast
     //used in CheckDistanceToGround() function for "" "" "" "" ""
     [HideInInspector]
-    public BoxCollider2D boxCollider;
+    public CapsuleCollider2D boxCollider;
 
     //taken from child object Items
     //used in DeployUmbrella()
@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour {
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        boxCollider = GetComponent<BoxCollider2D>();
+        boxCollider = GetComponent<CapsuleCollider2D>();
         //itemSwitcher = GetComponentInChildren<ItemSwitcher>();
         itemSwitcherAlt = GetComponentInChildren<ItemSwitcherAlt>();
         playerAnimScript = GetComponent<PlayerAnimationScript>();

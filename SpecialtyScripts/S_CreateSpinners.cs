@@ -48,9 +48,11 @@ public class S_CreateSpinners : TriggerEventBase
         }
         newArr[newArr.Length - 1] = g.GetComponent<SpriteRenderer>();
         w.enemyRenderers[worldNum] = newArr;
+        w.enemyRenderers[worldNum][w.enemyRenderers[worldNum].Length - 1].enabled = true;
 
         string hash = "W" + worldNum + "-" + w.enemyColliders[worldNum].Count;
         g.GetComponent<EnemyBase>().hash = hash;
         w.enemyColliders[worldNum].Add(hash, g.GetComponent<Collider2D>());
+        w.enemyColliders[worldNum][hash].enabled = true;
     }
 }

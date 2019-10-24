@@ -7,6 +7,14 @@ public class KeyObjectScript : MonoBehaviour
     Vector2 startPos;
     KeyScript keyScript;
 
+    public bool isWorldSpecific;
+    public int worldNum;
+    WorldSwitcher ws;
+    bool activeSet = false;
+    bool deactiveSet = false;
+    SpriteRenderer rend;
+    Collider2D coll;
+
     public bool isBlue;
     public bool isRed;
     public bool isGreen;
@@ -20,11 +28,19 @@ public class KeyObjectScript : MonoBehaviour
     {
         keyScript = GameObject.FindGameObjectWithTag("KeyCanvas").GetComponentInChildren<KeyScript>();
         startPos = (Vector2)transform.position;
+
+        if (isWorldSpecific)
+        {
+            ws = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<WorldSwitcher>();
+            rend = GetComponent<SpriteRenderer>();
+            coll = GetComponent<Collider2D>();
+        }
     }
 
     private void Update()
     {
         AnimateKey();
+        if (isWorldSpecific) ManageWorldSpecific();
     }
 
     private void AnimateKey()
@@ -57,6 +73,24 @@ public class KeyObjectScript : MonoBehaviour
             }
 
             Destroy(gameObject);
+        }
+    }
+
+    private void ManageWorldSpecific()
+    {
+        if(ws.activeWorldNum == worldNum && !activeSet)
+        {
+            rend.enabled = true;
+            coll.enabled = true;
+            deactiveSet = false;
+            activeSet = true;
+        }
+        else if(ws.activeWorldNum != worldNum && !deactiveSet)
+        {
+            rend.enabled = false;
+            coll.enabled = false;
+            activeSet = false;
+            deactiveSet = true;
         }
     }
 }
