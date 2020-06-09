@@ -31,7 +31,7 @@ public class KillOnLoad : MonoBehaviour {
     {
         coll = GetComponent<Collider2D>();
         size = (Vector2)coll.bounds.size;
-        playerDims = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>().size;
+        playerDims = GameObject.FindGameObjectWithTag("Player").GetComponent<CapsuleCollider2D>().size;
         pos = coll.transform;
         CreateInnerBox();
     }

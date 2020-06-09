@@ -52,4 +52,17 @@ public class SwitchScript : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //Debug.Log("Colliding");
+        if (collision.gameObject.tag == "Player" && (wS.activeWorldNum == worldNum || isPersistent))
+        {
+            if (playerController.isInteract)
+            {
+                isOn = !isOn;
+                playerController.isInteract = false;
+            }
+        }
+    }
 }

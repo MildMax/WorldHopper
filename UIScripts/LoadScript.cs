@@ -5,6 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class LoadScript : MonoBehaviour
 {
+    GameObject loadScreen;
+
+    private void Awake()
+    {
+        loadScreen = GameObject.FindGameObjectWithTag("LoadScreen");
+        loadScreen.SetActive(false);
+    }
 
     public void LoadCurrentScene()
     {
@@ -14,17 +21,23 @@ public class LoadScript : MonoBehaviour
 
     public void LoadMainScreen()
     {
-        SceneManager.LoadScene(0);
+        Load(0);
     }
 
     public void LoadScene(int levelID)
     {
-        SceneManager.LoadScene(levelID);
+        Load(levelID);
     }
 
     public void QuitGame()
     {
         Debug.Log("Quitting game");
         Application.Quit();
+    }
+
+    private void Load(int sceneIndex)
+    {
+        AsyncOperation a = SceneManager.LoadSceneAsync(sceneIndex);
+        loadScreen.SetActive(true);
     }
 }
