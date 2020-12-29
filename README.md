@@ -12,13 +12,23 @@ To play what's available, go to the 'build' folder and run the WorldHopper execu
 interface to start the game, navigate to "Levels", select "Test Level" and give it a go. 
 
 Controls:
+
 A -> Left
+
 D -> Right
+
 S -> go down faster
+
 LeftClick -> use item
+
 RightClick -> Change item
+
 1,2 -> switch worlds
+
 z,x -> preview worlds
+
 esc -> menu
+
+space -> jump
 
 Have fun!
